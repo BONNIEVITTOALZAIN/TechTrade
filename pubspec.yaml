@@ -1,0 +1,43 @@
+name: techtrade
+description: "A new Flutter project."
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  firebase_core: ^2.27.2
+  firebase_auth: ^4.18.0
+  image_picker: ^1.1.2
+  flutter_image_compress: ^2.3.0
+  geolocator: ^12.0.0
+  cloud_firestore: ^4.17.5
+  intl: ^0.20.2
+  flutter_launcher_icons: ^0.14.3
+  url_launcher: ^6.3.1
+  carousel_slider: ^5.0.0
+  shared_preferences: ^2.5.3
+  flutter_vector_icons: ^2.0.0
+  font_awesome_flutter: ^10.8.0
+  curved_navigation_bar: ^1.0.6
+  firebase_database: ^10.5.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logo.png"
+  min_sdk_android: 23
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/logo.png

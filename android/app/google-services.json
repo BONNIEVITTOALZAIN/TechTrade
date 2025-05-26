@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "744067021310",
+    "project_id": "dbtechtrade",
+    "storage_bucket": "dbtechtrade.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:744067021310:android:779fa25809a44195b6a8af",
+        "android_client_info": {
+          "package_name": "com.example.techtrade"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRvQ2xHysJ3Dxyyzk0hC9Zgn0rw2NJt8w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
