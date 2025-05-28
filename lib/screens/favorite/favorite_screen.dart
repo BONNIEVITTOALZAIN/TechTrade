@@ -16,7 +16,7 @@ class FavoritesScreen extends StatefulWidget {
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
-  List<String> favoriteItems = [];
+  List<DocumentSnapshot> favoriteProducts = []; // To store fetched product data
 
   @override
   void initState() {
@@ -26,10 +26,52 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   Future<void> _loadFavorites() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> favorites = prefs.getKeys().toList();
+    List<String> favoriteProductIds =
+        prefs.getStringList('favoriteProductIds') ??
+        []; // Assuming you save IDs as a list
+
+    if (favoriteProductIds.isEmpty) {
+      setState(() {
+        favoriteProducts = [];
+      });
+      return;
+    }
+
+    // Fetch product details for each favorite ID
+    List<DocumentSnapshot> fetchedProducts = [];
+    for (String productId in favoriteProductIds) {
+      try {
+        DocumentSnapshot doc =
+            await FirebaseFirestore.instance
+                .collection('posts')
+                .doc(productId)
+                .get();
+        if (doc.exists) {
+          fetchedProducts.add(doc);
+        } else {
+          // If a favorite product no longer exists in Firestore, remove it from SharedPreferences
+          favoriteProductIds.remove(productId);
+          prefs.setStringList('favoriteProductIds', favoriteProductIds);
+        }
+      } catch (e) {
+        print("Error fetching favorite product $productId: $e");
+      }
+    }
+
     setState(() {
-      favoriteItems = favorites;
+      favoriteProducts = fetchedProducts;
     });
+  }
+
+  Future<void> _removeFavorite(String productIdToRemove) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> favoriteProductIds =
+        prefs.getStringList('favoriteProductIds') ?? [];
+
+    favoriteProductIds.remove(productIdToRemove);
+    await prefs.setStringList('favoriteProductIds', favoriteProductIds);
+
+    _loadFavorites(); // Reload favorites to update the UI
   }
 
   @override
@@ -47,36 +89,127 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              favoriteItems.isEmpty
+              favoriteProducts.isEmpty
                   ? const Center(child: Text('Belum ada produk favorit'))
                   : ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: favoriteItems.length,
+                    itemCount: favoriteProducts.length,
                     itemBuilder: (context, index) {
+                      final doc = favoriteProducts[index];
+                      final data = doc.data() as Map<String, dynamic>;
+
+                      final images = List<String>.from(data['images'] ?? []);
+                      final imageBase64 = images.isNotEmpty ? images[0] : '';
+                      Uint8List image = Uint8List(0);
+                      try {
+                        if (imageBase64.isNotEmpty) {
+                          image = base64Decode(imageBase64);
+                        }
+                      } catch (_) {}
+
+                      final itemName = data['itemName'] ?? 'Nama Barang';
+                      final description =
+                          data['description'] ?? 'Deskripsi tidak tersedia';
+                      final price = data['price'];
+                      final formattedPrice =
+                          price is num
+                              ? currencyFormat.format(price)
+                              : price?.toString() ?? '-';
+
+                      DateTime createdAt;
+                      try {
+                        createdAt = DateTime.parse(data['createdAt']);
+                      } catch (_) {
+                        createdAt = DateTime.now();
+                      }
+                      final fullName = data['fullName'] ?? 'Anonim';
+                      final location =
+                          data['location'] ?? 'Lokasi tidak diketahui';
+                      final category = data['category'] ?? '';
+                      final stock = data['stock'];
+                      final weight = data['weight'];
+
                       return Card(
                         margin: const EdgeInsets.symmetric(vertical: 8.0),
                         elevation: 4.0,
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(16.0),
-                          title: Text(
-                            favoriteItems[index],
-                            style: const TextStyle(fontSize: 18),
-                          ),
-                          subtitle: const Text(
-                            'Deskripsi produk di sini',
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.remove_circle_outline),
-                            onPressed: () async {
-                              SharedPreferences prefs =
-                                  await SharedPreferences.getInstance();
-                              prefs.remove(favoriteItems[index]);
-                              setState(() {
-                                favoriteItems.removeAt(index);
-                              });
-                            },
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (_) => DetailScreen(
+                                      imagesBase64: images,
+                                      description: description,
+                                      createdAt: createdAt,
+                                      fullName: fullName,
+                                      location: location,
+                                      category: category,
+                                      itemName: itemName,
+                                      price: price,
+                                      stock: stock,
+                                      weight: weight,
+                                      heroTag:
+                                          'favorite-post-$index', // Unique heroTag
+                                    ),
+                              ),
+                            ).then(
+                              (_) => _loadFavorites(),
+                            ); // Reload after returning from detail screen
+                          },
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.all(16.0),
+                            leading: SizedBox(
+                              width: 80, // Adjust size as needed
+                              height: 80, // Adjust size as needed
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8.0),
+                                child:
+                                    image.isNotEmpty
+                                        ? Image.memory(image, fit: BoxFit.cover)
+                                        : Container(
+                                          color: Colors.grey[200],
+                                          child: const Icon(
+                                            Icons.image,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                              ),
+                            ),
+                            title: Text(
+                              itemName,
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  formattedPrice,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.teal,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  location,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(
+                                Icons.remove_circle_outline,
+                                color: Colors.red,
+                              ),
+                              onPressed: () async {
+                                await _removeFavorite(doc.id);
+                              },
+                            ),
                           ),
                         ),
                       );
@@ -110,7 +243,7 @@ class ProductGrid extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
-          return Center(child: Text("Error: \${snapshot.error}"));
+          return Center(child: Text("Error: ${snapshot.error}"));
         }
 
         final docs = snapshot.data?.docs ?? [];
@@ -132,7 +265,8 @@ class ProductGrid extends StatelessWidget {
             childAspectRatio: 3 / 5,
           ),
           itemBuilder: (context, index) {
-            final data = docs[index].data() as Map<String, dynamic>;
+            final doc = docs[index]; // Get the DocumentSnapshot
+            final data = doc.data() as Map<String, dynamic>;
             final images = List<String>.from(data['images'] ?? []);
             final imageBase64 = images.isNotEmpty ? images[0] : '';
             Uint8List image = Uint8List(0);
@@ -169,8 +303,6 @@ class ProductGrid extends StatelessWidget {
                           description: data['description'] ?? '',
                           createdAt: createdAt,
                           fullName: data['fullName'] ?? 'Anonim',
-                          latitude: data['latitude'],
-                          longitude: data['longitude'],
                           location: location,
                           category: data['category'] ?? '',
                           itemName: itemName,

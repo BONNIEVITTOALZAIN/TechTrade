@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:techtrade/screens/home_screen.dart';
 
 class AddPostScreen extends StatefulWidget {
   const AddPostScreen({super.key});
@@ -26,10 +26,10 @@ class _AddPostScreenState extends State<AddPostScreen> {
   final List<File?> _images = [null, null, null];
   final List<String?> _base64Images = [null, null, null];
   bool _isUploading = false;
-  double? _latitude, _longitude;
 
   String _selectedCategory = 'Other';
   final List<String> _categories = [
+    'Smartphone',
     'Mouse',
     'Keyboard',
     'Pc',
@@ -81,35 +81,31 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
   Future<void> _processPickedImage(XFile? picked, int index) async {
     if (picked != null) {
-      setState(() {
-        _images[index] = File(picked.path);
-      });
-      final compressed = await FlutterImageCompress.compressWithFile(
-        picked.path,
-        quality: 50,
-      );
-      if (compressed != null) {
-        _base64Images[index] = base64Encode(compressed);
+      try {
+        final compressed = await FlutterImageCompress.compressWithFile(
+          picked.path,
+          quality: 50,
+        );
+        if (compressed != null) {
+          setState(() {
+            _images[index] = File(picked.path);
+            _base64Images[index] = base64Encode(compressed);
+          });
+        } else {
+          setState(() {
+            _images[index] = File(picked.path);
+            _base64Images[index] = null;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to compress image')),
+          );
+        }
+      } catch (e) {
+        debugPrint('Compress error: $e');
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Error processing image')));
       }
-    }
-  }
-
-  Future<void> _getLocation() async {
-    if (!await Geolocator.isLocationServiceEnabled()) return;
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-    if (permission == LocationPermission.deniedForever) return;
-
-    try {
-      final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-      _latitude = position.latitude;
-      _longitude = position.longitude;
-    } catch (e) {
-      debugPrint('Location error: $e');
     }
   }
 
@@ -142,12 +138,15 @@ class _AddPostScreenState extends State<AddPostScreen> {
     }
 
     try {
-      await _getLocation();
       final userDoc =
           await FirebaseFirestore.instance.collection('users').doc(uid).get();
       final fullName = userDoc.data()?['fullName'] ?? 'Anonymous';
 
-      await FirebaseFirestore.instance.collection('posts').add({
+      final docRef = FirebaseFirestore.instance.collection('posts').doc();
+      final productId = docRef.id;
+
+      await docRef.set({
+        'productId': productId,
         'images': _base64Images,
         'itemName': _nameController.text,
         'price': double.tryParse(_priceController.text) ?? 0,
@@ -156,14 +155,17 @@ class _AddPostScreenState extends State<AddPostScreen> {
         'description': _descriptionController.text,
         'category': _selectedCategory,
         'createdAt': now,
-        'latitude': _latitude,
-        'longitude': _longitude,
         'location': _locationController.text,
         'fullName': fullName,
         'userId': uid,
       });
 
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      }
     } catch (e) {
       debugPrint('Submit error: $e');
       ScaffoldMessenger.of(
@@ -197,7 +199,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                   )
                   : Center(
                     child: Text(
-                      'Add Image',
+                      'Image',
                       style: TextStyle(color: Colors.grey[700]),
                     ),
                   ),
@@ -330,27 +332,63 @@ class _AddPostScreenState extends State<AddPostScreen> {
           });
         },
         items:
-            _categories
-                .map(
-                  (cat) => DropdownMenuItem<String>(
-                    value: cat,
-                    child: Row(
-                      children: [
-                        Icon(
-                          cat == 'Sepatu'
-                              ? Icons.directions_run
-                              : cat == 'Baju'
-                              ? Icons.checkroom
-                              : Icons.backpack,
-                          color: Colors.teal,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(cat),
-                      ],
-                    ),
-                  ),
-                )
-                .toList(),
+            _categories.map((cat) {
+              IconData iconData;
+
+              switch (cat) {
+                case 'Smartphone':
+                  iconData = Icons.smartphone;
+                  break;
+                case 'Mouse':
+                  iconData = Icons.mouse;
+                  break;
+                case 'Keyboard':
+                  iconData = Icons.keyboard;
+                  break;
+                case 'Pc':
+                  iconData = Icons.computer;
+                  break;
+                case 'Vga':
+                  iconData = Icons.memory;
+                  break;
+                case 'Cpu':
+                  iconData = Icons.memory;
+                  break;
+                case 'Storage':
+                  iconData = Icons.sd_storage;
+                  break;
+                case 'Ram':
+                  iconData = Icons.memory;
+                  break;
+                case 'Console':
+                  iconData = Icons.videogame_asset;
+                  break;
+                case 'Controller':
+                  iconData = Icons.gamepad;
+                  break;
+                case 'Headphone':
+                  iconData = Icons.headphones;
+                  break;
+                case 'Laptop':
+                  iconData = Icons.laptop;
+                  break;
+                case 'Other':
+                default:
+                  iconData = Icons.device_unknown;
+                  break;
+              }
+
+              return DropdownMenuItem<String>(
+                value: cat,
+                child: Row(
+                  children: [
+                    Icon(iconData, color: Colors.teal),
+                    const SizedBox(width: 8),
+                    Text(cat),
+                  ],
+                ),
+              );
+            }).toList(),
       ),
     );
   }
@@ -367,52 +405,78 @@ class _AddPostScreenState extends State<AddPostScreen> {
         actions: [
           _isUploading
               ? const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Center(child: CircularProgressIndicator()),
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Center(
+                  child: SizedBox(
+                    height: 18,
+                    width: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
               )
               : TextButton(
                 onPressed: _submitPost,
                 child: const Text(
-                  "Jual",
+                  'Jual',
                   style: TextStyle(
-                    fontSize: 16,
+                    color: Colors.teal,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
                   ),
                 ),
               ),
         ],
+        backgroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildImageCarousel(),
-            const SizedBox(height: 24),
-            _buildInput("Item Name", _nameController),
-            const SizedBox(height: 16),
-            _buildInput(
-              "Price (Rp)",
-              _priceController,
-              type: TextInputType.number,
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildImageCarousel(),
+                const SizedBox(height: 20),
+                _buildInput('Nama Produk', _nameController),
+                const SizedBox(height: 14),
+                _buildCategoryDropdown(),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildInput(
+                        'Harga',
+                        _priceController,
+                        type: TextInputType.number,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: _buildInput(
+                        'Berat (Kg)',
+                        _weightController,
+                        type: TextInputType.number,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                _buildInput(
+                  'Stok',
+                  _stockController,
+                  type: TextInputType.number,
+                ),
+                const SizedBox(height: 14),
+                _buildInput('Lokasi Produk', _locationController),
+                const SizedBox(height: 14),
+                _buildInput(
+                  'Deskripsi Produk',
+                  _descriptionController,
+                  maxLines: 5,
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            _buildCategoryDropdown(),
-            const SizedBox(height: 16),
-            _buildInput("Stock", _stockController, type: TextInputType.number),
-            const SizedBox(height: 16),
-            _buildInput(
-              "Weight (kg)",
-              _weightController,
-              type: TextInputType.number,
-            ),
-            const SizedBox(height: 16),
-            _buildInput("Location", _locationController),
-            const SizedBox(height: 16),
-            _buildInput("Description", _descriptionController, maxLines: 4),
-            const SizedBox(height: 40),
-          ],
+          ),
         ),
       ),
     );

@@ -254,8 +254,6 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                           createdAt: createdAt,
                                           fullName:
                                               data['fullName'] ?? 'Anonim',
-                                          latitude: data['latitude'],
-                                          longitude: data['longitude'],
                                           location: location,
                                           category: data['category'] ?? '',
                                           itemName: itemName,

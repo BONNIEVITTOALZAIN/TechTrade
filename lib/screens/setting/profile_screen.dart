@@ -277,7 +277,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         child:
                             (base64Image == null || base64Image!.isEmpty)
                                 ? const Icon(
-                                  Icons.person,
+                                  Icons.person_2,
                                   size: 40,
                                   color: Colors.blue,
                                 )
@@ -295,7 +295,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     const Divider(height: 32),
                     _buildLabel('Info Profil'),
                     const SizedBox(height: 12),
-                    _buildItemRow('Nama', _fullNameController),
+                    _buildItemRow(
+                      'Nama',
+                      _fullNameController,
+                      onTapOverride: () {},
+                    ),
                     _buildItemRow('Username', _userNameController),
                     _buildItemRow('Bio', _bioController),
                     const Divider(height: 32),

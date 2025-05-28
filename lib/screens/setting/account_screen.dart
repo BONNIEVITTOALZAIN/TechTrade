@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:techtrade/screens/cart/cart_screen.dart';
 import 'package:techtrade/screens/detail/detail_screen.dart';
 import 'package:techtrade/screens/favorite/favorite_screen.dart';
 import 'package:techtrade/screens/setting/setting_screen.dart';
@@ -22,13 +23,6 @@ class AccountPage extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        elevation: 0,
-      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
@@ -126,9 +120,49 @@ class AccountPage extends StatelessWidget {
                           ),
                           const SizedBox(width: 12),
                           const Text(
-                            'Favorite',
+                            'WishList',
                             style: TextStyle(fontSize: 16),
                           ),
+                        ],
+                      ),
+                      const Icon(Icons.chevron_right, color: Colors.teal),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => CartScreen()),
+                );
+              },
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 4,
+                margin: EdgeInsets.zero,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 16,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.shopping_cart_outlined,
+                            color: Colors.blueGrey,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 12),
+                          const Text('Cart', style: TextStyle(fontSize: 16)),
                         ],
                       ),
                       const Icon(Icons.chevron_right, color: Colors.teal),
@@ -214,8 +248,6 @@ class AccountPage extends StatelessWidget {
                                   description: data['description'] ?? '',
                                   createdAt: createdAt,
                                   fullName: data['fullName'] ?? 'Anonim',
-                                  latitude: data['latitude'],
-                                  longitude: data['longitude'],
                                   location: location,
                                   category: data['category'] ?? '',
                                   itemName: itemName,

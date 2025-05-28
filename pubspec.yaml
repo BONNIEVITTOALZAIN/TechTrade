@@ -23,8 +23,8 @@ dependencies:
   shared_preferences: ^2.5.3
   flutter_vector_icons: ^2.0.0
   font_awesome_flutter: ^10.8.0
-  curved_navigation_bar: ^1.0.6
-  firebase_database: ^10.5.7
+  shimmer: ^3.0.0
+  http: ^1.4.0
 
 dev_dependencies:
   flutter_test:

@@ -53,7 +53,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                 _buildTextField(
                   controller: _fullNameController,
                   label: 'Full Name',
-                  icon: Icons.person,
+                  icon: Icons.person_2_outlined,
                   validator:
                       (value) =>
                           value == null || value.trim().isEmpty

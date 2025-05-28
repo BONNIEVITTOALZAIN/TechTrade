@@ -19,12 +19,11 @@ class SignInScreenState extends State<SignInScreen> {
   bool _isPasswordVisible = false;
 
   void _signIn() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     setState(() => _isLoading = true);
+
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
@@ -42,6 +41,24 @@ class SignInScreenState extends State<SignInScreen> {
     }
   }
 
+  void _resetPassword() async {
+    final email = _emailController.text.trim();
+
+    if (email.isEmpty || !_isValidEmail(email)) {
+      _showSnackBar('Masukkan email yang valid untuk reset password.');
+      return;
+    }
+
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      _showSnackBar('Link reset password telah dikirim ke $email');
+    } on FirebaseAuthException catch (e) {
+      _showSnackBar(_getAuthErrorMessage(e.code));
+    } catch (e) {
+      _showSnackBar('Terjadi kesalahan saat mengirim email reset password.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,10 +66,9 @@ class SignInScreenState extends State<SignInScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            // Header background hitam
             Container(
               height: 250,
-              decoration: const BoxDecoration(color: Colors.black),
+              decoration: const BoxDecoration(color: Colors.teal),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,8 +90,6 @@ class SignInScreenState extends State<SignInScreen> {
                 ],
               ),
             ),
-
-            // Form putih
             Container(
               margin: const EdgeInsets.only(top: 200),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
@@ -149,10 +163,10 @@ class SignInScreenState extends State<SignInScreen> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: _resetPassword,
                           child: const Text(
                             'Lupa Password?',
-                            style: TextStyle(color: Colors.blue),
+                            style: TextStyle(color: Colors.teal),
                           ),
                         ),
                       ),
@@ -166,7 +180,7 @@ class SignInScreenState extends State<SignInScreen> {
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 16,
                                 ),
-                                backgroundColor: Colors.blue,
+                                backgroundColor: Colors.teal,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -201,7 +215,7 @@ class SignInScreenState extends State<SignInScreen> {
                             TextSpan(
                               text: 'Sign Up',
                               style: const TextStyle(
-                                color: Colors.blue,
+                                color: Colors.teal,
                                 fontWeight: FontWeight.bold,
                               ),
                               recognizer:
@@ -245,11 +259,13 @@ class SignInScreenState extends State<SignInScreen> {
   String _getAuthErrorMessage(String code) {
     switch (code) {
       case 'user-not-found':
-        return 'No user found with that email';
+        return 'Email tidak ditemukan.';
       case 'wrong-password':
-        return 'Wrong password. Please try again.';
+        return 'Password salah. Silakan coba lagi.';
+      case 'invalid-email':
+        return 'Format email tidak valid.';
       default:
-        return 'An error occurred. Please try again.';
+        return 'Terjadi kesalahan. Silakan coba lagi.';
     }
   }
 }

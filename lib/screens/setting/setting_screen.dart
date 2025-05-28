@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:techtrade/screens/AuthScreen/sign_in_screen.dart';
+import 'package:techtrade/screens/setting/address_screen.dart';
 import 'package:techtrade/screens/setting/profile_screen.dart';
+
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -35,7 +37,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.person),
+            leading: const Icon(Icons.person_2),
             title: const Text('Ubah Profil'),
             subtitle: const Text('Atur identitas dan foto profil kamu'),
             onTap: () {
@@ -50,7 +52,10 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text('Daftar Alamat'),
             subtitle: const Text('Atur alamat pengiriman belanjaan'),
             onTap: () {
-              // TODO: Navigasi ke halaman alamat
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AddressPage()),
+              );
             },
           ),
           const Divider(height: 32),
