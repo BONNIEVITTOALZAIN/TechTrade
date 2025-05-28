@@ -20,7 +20,12 @@ class CategoryScreen extends StatelessWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(title: Text(categoryLabel), backgroundColor: Colors.white),
+      appBar: AppBar(
+        title: Text(
+          categoryLabel,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
       backgroundColor: Colors.white,
       body: StreamBuilder<QuerySnapshot>(
         stream:
@@ -41,10 +46,21 @@ class CategoryScreen extends StatelessWidget {
           final docs = snapshot.data?.docs ?? [];
 
           if (docs.isEmpty) {
-            return const Center(
-              child: Text(
-                'Produk tidak ditemukan di kategori ini.',
-                style: TextStyle(fontSize: 16),
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.search_off_outlined,
+                    size: 80,
+                    color: Colors.teal.withOpacity(0.4),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Produk tidak ditemukan di kategori ini.',
+                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                  ),
+                ],
               ),
             );
           }
@@ -103,7 +119,10 @@ class CategoryScreen extends StatelessWidget {
                               price: data['price'],
                               stock: data['stock'],
                               weight: data['weight'],
-                              heroTag: 'post-$index',                            ),
+                              heroTag: 'post-$index',
+                              productId: docs[index].id,
+                              averageRating: (data['averageRating'] ?? 0.0),
+                            ),
                       ),
                     );
                   },

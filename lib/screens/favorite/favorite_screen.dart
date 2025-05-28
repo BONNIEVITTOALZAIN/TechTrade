@@ -16,7 +16,7 @@ class FavoritesScreen extends StatefulWidget {
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
-  List<DocumentSnapshot> favoriteProducts = []; // To store fetched product data
+  List<String> favoriteItems = [];
 
   @override
   void initState() {
@@ -25,59 +25,27 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   Future<void> _loadFavorites() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> favoriteProductIds =
-        prefs.getStringList('favoriteProductIds') ??
-        []; // Assuming you save IDs as a list
-
-    if (favoriteProductIds.isEmpty) {
-      setState(() {
-        favoriteProducts = [];
-      });
-      return;
-    }
-
-    // Fetch product details for each favorite ID
-    List<DocumentSnapshot> fetchedProducts = [];
-    for (String productId in favoriteProductIds) {
-      try {
-        DocumentSnapshot doc =
-            await FirebaseFirestore.instance
-                .collection('posts')
-                .doc(productId)
-                .get();
-        if (doc.exists) {
-          fetchedProducts.add(doc);
-        } else {
-          // If a favorite product no longer exists in Firestore, remove it from SharedPreferences
-          favoriteProductIds.remove(productId);
-          prefs.setStringList('favoriteProductIds', favoriteProductIds);
-        }
-      } catch (e) {
-        print("Error fetching favorite product $productId: $e");
-      }
-    }
-
+    final prefs = await SharedPreferences.getInstance();
+    final favorites = prefs.getStringList('favorites') ?? [];
     setState(() {
-      favoriteProducts = fetchedProducts;
+      favoriteItems = favorites;
     });
   }
 
-  Future<void> _removeFavorite(String productIdToRemove) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> favoriteProductIds =
-        prefs.getStringList('favoriteProductIds') ?? [];
-
-    favoriteProductIds.remove(productIdToRemove);
-    await prefs.setStringList('favoriteProductIds', favoriteProductIds);
-
-    _loadFavorites(); // Reload favorites to update the UI
+  Future<void> _removeFavoriteAt(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    final updatedFavorites = List<String>.from(favoriteItems);
+    updatedFavorites.removeAt(index);
+    await prefs.setStringList('favorites', updatedFavorites);
+    setState(() {
+      favoriteItems = updatedFavorites;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Favorites')),
+      appBar: AppBar(title: const Text('Wishlist')),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -85,131 +53,85 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Produk Favorit',
+                'Produk Wishlist',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              favoriteProducts.isEmpty
-                  ? const Center(child: Text('Belum ada produk favorit'))
+              favoriteItems.isEmpty
+                  ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.favorite_border,
+                          size: 80,
+                          color: Colors.teal.withOpacity(0.4),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'Belum ada produk favorit',
+                          style: TextStyle(fontSize: 16, color: Colors.black54),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  )
                   : ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: favoriteProducts.length,
+                    itemCount: favoriteItems.length,
                     itemBuilder: (context, index) {
-                      final doc = favoriteProducts[index];
-                      final data = doc.data() as Map<String, dynamic>;
-
-                      final images = List<String>.from(data['images'] ?? []);
-                      final imageBase64 = images.isNotEmpty ? images[0] : '';
-                      Uint8List image = Uint8List(0);
+                      final itemData = jsonDecode(favoriteItems[index]);
+                      final itemName = itemData['itemName'] ?? 'Produk';
+                      final price = itemData['price'] ?? 0;
+                      final imageBase64 = itemData['image'] ?? '';
+                      Uint8List? imageBytes;
                       try {
                         if (imageBase64.isNotEmpty) {
-                          image = base64Decode(imageBase64);
+                          imageBytes = base64Decode(imageBase64);
                         }
-                      } catch (_) {}
-
-                      final itemName = data['itemName'] ?? 'Nama Barang';
-                      final description =
-                          data['description'] ?? 'Deskripsi tidak tersedia';
-                      final price = data['price'];
-                      final formattedPrice =
-                          price is num
-                              ? currencyFormat.format(price)
-                              : price?.toString() ?? '-';
-
-                      DateTime createdAt;
-                      try {
-                        createdAt = DateTime.parse(data['createdAt']);
                       } catch (_) {
-                        createdAt = DateTime.now();
+                        imageBytes = null;
                       }
-                      final fullName = data['fullName'] ?? 'Anonim';
-                      final location =
-                          data['location'] ?? 'Lokasi tidak diketahui';
-                      final category = data['category'] ?? '';
-                      final stock = data['stock'];
-                      final weight = data['weight'];
+                      final formattedPrice = currencyFormat.format(price);
 
                       return Card(
                         margin: const EdgeInsets.symmetric(vertical: 8.0),
                         elevation: 4.0,
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (_) => DetailScreen(
-                                      imagesBase64: images,
-                                      description: description,
-                                      createdAt: createdAt,
-                                      fullName: fullName,
-                                      location: location,
-                                      category: category,
-                                      itemName: itemName,
-                                      price: price,
-                                      stock: stock,
-                                      weight: weight,
-                                      heroTag:
-                                          'favorite-post-$index', // Unique heroTag
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.all(16.0),
+                          leading:
+                              imageBytes != null
+                                  ? Image.memory(
+                                    imageBytes,
+                                    width: 50,
+                                    height: 50,
+                                    fit: BoxFit.cover,
+                                  )
+                                  : Container(
+                                    width: 50,
+                                    height: 50,
+                                    color: Colors.grey[300],
+                                    child: const Icon(
+                                      Icons.image_not_supported,
                                     ),
-                              ),
-                            ).then(
-                              (_) => _loadFavorites(),
-                            ); // Reload after returning from detail screen
-                          },
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.all(16.0),
-                            leading: SizedBox(
-                              width: 80, // Adjust size as needed
-                              height: 80, // Adjust size as needed
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.0),
-                                child:
-                                    image.isNotEmpty
-                                        ? Image.memory(image, fit: BoxFit.cover)
-                                        : Container(
-                                          color: Colors.grey[200],
-                                          child: const Icon(
-                                            Icons.image,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                              ),
-                            ),
-                            title: Text(
-                              itemName,
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  formattedPrice,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.teal,
-                                    fontWeight: FontWeight.bold,
                                   ),
-                                ),
-                                Text(
-                                  location,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
+                          title: Text(
+                            itemName,
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                          subtitle: Text(
+                            formattedPrice,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.teal,
                             ),
-                            trailing: IconButton(
-                              icon: const Icon(
-                                Icons.remove_circle_outline,
-                                color: Colors.red,
-                              ),
-                              onPressed: () async {
-                                await _removeFavorite(doc.id);
-                              },
-                            ),
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.remove_circle_outline),
+                            onPressed: () async {
+                              await _removeFavoriteAt(index);
+                            },
                           ),
                         ),
                       );
@@ -248,9 +170,26 @@ class ProductGrid extends StatelessWidget {
 
         final docs = snapshot.data?.docs ?? [];
         if (docs.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.all(32),
-            child: Center(child: Text("Tidak ada produk ditemukan.")),
+          return Padding(
+            padding: const EdgeInsets.all(32),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.search_off_outlined,
+                    size: 80,
+                    color: Colors.teal.withOpacity(0.4),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "Tidak ada produk ditemukan.",
+                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
           );
         }
 
@@ -265,8 +204,7 @@ class ProductGrid extends StatelessWidget {
             childAspectRatio: 3 / 5,
           ),
           itemBuilder: (context, index) {
-            final doc = docs[index]; // Get the DocumentSnapshot
-            final data = doc.data() as Map<String, dynamic>;
+            final data = docs[index].data() as Map<String, dynamic>;
             final images = List<String>.from(data['images'] ?? []);
             final imageBase64 = images.isNotEmpty ? images[0] : '';
             Uint8List image = Uint8List(0);
@@ -306,10 +244,12 @@ class ProductGrid extends StatelessWidget {
                           location: location,
                           category: data['category'] ?? '',
                           itemName: itemName,
-                          price: price,
+                          price: data['price'],
                           stock: data['stock'],
                           weight: data['weight'],
                           heroTag: 'post-$index',
+                          productId: docs[index].id,
+                          averageRating: (data['averageRating'] ?? 0.0),
                         ),
                   ),
                 );

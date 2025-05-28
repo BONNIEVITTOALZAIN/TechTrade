@@ -261,6 +261,9 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                           stock: data['stock'],
                                           weight: data['weight'],
                                           heroTag: 'post-$index',
+                                          productId: docs[index].id,
+                                          averageRating:
+                                              (data['averageRating'] ?? 0.0),
                                         ),
                                   ),
                                 );

@@ -255,6 +255,8 @@ class AccountPage extends StatelessWidget {
                                   stock: data['stock'],
                                   weight: data['weight'],
                                   heroTag: 'post-$index',
+                                  productId: docs[index].id,
+                                  averageRating: (data['averageRating'] ?? 0.0),
                                 ),
                           ),
                         );

@@ -235,26 +235,11 @@ class _HomeContentState extends State<HomeContent> {
                             kategoriItem("Keyboard", Icons.keyboard),
                             kategoriItem("VGA", Icons.memory),
                             kategoriItem("Storage", Icons.sd_storage),
-                            kategoriItem(
-                              "CPU",
-                              Icons.memory,
-                            ), // tambahan kategori baru
-                            kategoriItem(
-                              "RAM",
-                              Icons.memory,
-                            ), // tambahan kategori baru
-                            kategoriItem(
-                              "Console",
-                              Icons.videogame_asset,
-                            ), // tambahan kategori baru
-                            kategoriItem(
-                              "Controller",
-                              Icons.gamepad,
-                            ), // tambahan kategori baru
-                            kategoriItem(
-                              "Other",
-                              Icons.category,
-                            ), // tambahan kategori baru
+                            kategoriItem("CPU", Icons.memory),
+                            kategoriItem("RAM", Icons.memory),
+                            kategoriItem("Console", Icons.videogame_asset),
+                            kategoriItem("Controller", Icons.gamepad),
+                            kategoriItem("Other", Icons.category),
                           ]
                           .map(
                             (w) => Padding(
@@ -270,7 +255,7 @@ class _HomeContentState extends State<HomeContent> {
 
               // Produk
               const Text(
-                "Rekomendasi Untuk anda",
+                "Produk Lainnya",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 12),
@@ -292,7 +277,6 @@ class _HomeContentState extends State<HomeContent> {
                 stream: getPostsStream(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    // Shimmer placeholder grid while loading
                     return GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -433,7 +417,9 @@ class _HomeContentState extends State<HomeContent> {
                                     stock: data['stock'],
                                     weight: data['weight'],
                                     heroTag: 'post-$index',
-
+                                    productId: docs[index].id,
+                                    averageRating:
+                                        (data['averageRating'] ?? 0.0),
                                   ),
                             ),
                           );

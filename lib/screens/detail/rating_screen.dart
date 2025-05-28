@@ -79,7 +79,7 @@ class _RatingScreenState extends State<RatingScreen> {
     try {
       final userDoc =
           await FirebaseFirestore.instance.collection('users').doc(uid).get();
-      final username = userDoc.data()?['username'] ?? 'Anonim';
+      final username = userDoc.data()?['fullName'] ?? 'Anonim';
 
       final reviewData = {
         'userId': uid,
@@ -190,7 +190,7 @@ class _RatingScreenState extends State<RatingScreen> {
                 : ElevatedButton(
                   onPressed: _submitReview,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                    backgroundColor: Colors.teal,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     textStyle: const TextStyle(fontSize: 18),
