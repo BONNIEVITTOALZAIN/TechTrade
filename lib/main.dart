@@ -27,10 +27,10 @@ class MyApp extends StatelessWidget {
 }
 
 // notes :
-// 1. belum bikin navbar
-// 2. desain ulang wishlist
-// 3. buat keranjang
-// 4. buat profile screen yang bisa lupa password,ganti foto
-// 5. tambahkan di detail screen tombol add to cart dan buy now
-// 6. tambahkan di cart screen 
-// 7. 
+// 1. belum bikin navbar ( done )
+// 2. desain ulang wishlist ( done )
+// 3. buat keranjang belanja ( done )
+// 4. buat profile screen yang bisa lupa password,ganti foto (done)
+// 5. tambahkan di detail screen tombol add to cart dan buy now (done)
+// 6. tambahkan di cart screen (done)
+// 7.

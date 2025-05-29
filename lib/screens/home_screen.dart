@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:techtrade/screens/Checkout/transaksi_list_screen.dart';
 import 'package:techtrade/screens/other/add_post_screen.dart';
 import 'package:techtrade/screens/other/home_content_screen.dart';
 import 'package:techtrade/screens/setting/account_screen.dart';
@@ -17,12 +18,13 @@ class _HomeScreenState extends State<HomeScreen> {
     const HomeContent(),
     const AddPostScreen(),
     const AccountPage(),
+    const TransactionListScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: screens[currentIndex],
+      body: screens[currentIndex.clamp(0, screens.length - 1)],
       bottomNavigationBar: Container(
         height: 45,
         decoration: BoxDecoration(
@@ -37,6 +39,11 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.add_a_photo_outlined,
               index: 1,
               label: "Upload",
+            ),
+            navItem(
+              icon: Icons.shopping_bag_outlined,
+              index: 3,
+              label: "Transaksi",
             ),
             navItem(icon: Icons.person_2, index: 2, label: "Akun"),
           ],

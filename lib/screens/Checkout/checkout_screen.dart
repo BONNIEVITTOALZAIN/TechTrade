@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'dart:math';
+import 'package:techtrade/screens/Checkout/transaksi_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final List<Map<String, dynamic>> items;
@@ -17,6 +20,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   List<String> addresses = [];
   int selectedAddressIndex = 0;
   bool isLoading = true;
+  bool _localeInitialized = false;
 
   List<String> couriers = [
     "JNE Regular",
@@ -45,7 +49,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   void initState() {
     super.initState();
+    _initializeLocale();
     fetchUserLocations();
+  }
+
+  Future<void> _initializeLocale() async {
+    try {
+      await initializeDateFormatting('id_ID', null);
+      setState(() {
+        _localeInitialized = true;
+      });
+    } catch (e) {
+      print("Error initializing locale: $e");
+      setState(() {
+        _localeInitialized = true;
+      });
+    }
   }
 
   Future<void> fetchUserLocations() async {
@@ -99,16 +118,102 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
   }
 
-  void checkout() async {
-    await reduceStock();
+  Future<void> saveTransactionToFirebase(String transactionId) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Pembelian berhasil!"),
-        backgroundColor: Colors.green,
-      ),
+      final transactionData = {
+        'transactionId': transactionId,
+        'userId': user.uid,
+        'items': widget.items,
+        'selectedAddress':
+            addresses.isNotEmpty ? addresses[selectedAddressIndex] : '',
+        'selectedCourier': selectedCourier,
+        'itemsTotal': itemsTotal,
+        'shippingCost': shippingCost,
+        'totalPrice': totalPrice,
+        'transactionDate': FieldValue.serverTimestamp(),
+        'status': 'Berhasil',
+      };
+
+      await FirebaseFirestore.instance
+          .collection('transactions')
+          .doc(transactionId)
+          .set(transactionData);
+    } catch (e) {
+      print("Error saving transaction: $e");
+    }
+  }
+
+  String generateTransactionId() {
+    final now = DateTime.now();
+    final dateString = DateFormat('yyyyMMdd').format(now);
+    final randomNum = Random().nextInt(9999).toString().padLeft(4, '0');
+    return 'TRX$dateString$randomNum';
+  }
+
+  void checkout() async {
+    if (addresses.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Silakan tambahkan alamat pengiriman terlebih dahulu"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (context) => const AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text("Memproses pembayaran..."),
+              ],
+            ),
+          ),
     );
-    Navigator.pop(context, true);
+
+    try {
+      await reduceStock();
+
+      final transactionId = generateTransactionId();
+      await saveTransactionToFirebase(transactionId);
+
+      Navigator.pop(context);
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => TransactionDetailScreen(
+                transactionId: transactionId,
+                items: widget.items,
+                selectedAddress: addresses[selectedAddressIndex],
+                selectedCourier: selectedCourier,
+                itemsTotal: itemsTotal,
+                shippingCost: shippingCost,
+                totalPrice: totalPrice,
+                transactionDate: DateTime.now(),
+              ),
+        ),
+      );
+    } catch (e) {
+      Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Terjadi kesalahan: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void showAddAddressDialog() {
@@ -188,7 +293,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
         ),
         trailing: Text(
-          'Rp${NumberFormat('#,##0', 'id_ID').format(amount)}',
+          'Rp${_formatCurrency(amount)}',
           style: TextStyle(
             fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
             fontSize: isTotal ? 18 : 16,
@@ -196,6 +301,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
         ),
       );
+
+  String _formatCurrency(num amount) {
+    try {
+      if (_localeInitialized) {
+        return NumberFormat('#,##0', 'id_ID').format(amount);
+      } else {
+        return NumberFormat('#,##0').format(amount);
+      }
+    } catch (e) {
+      return amount.toString().replaceAllMapped(
+        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+        (Match m) => '${m[1]},',
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -219,7 +339,40 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       icon: Icons.location_on,
                     ),
                     if (addresses.isEmpty)
-                      const Text("Tidak ada alamat ditemukan."),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.orange.shade200),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.location_off,
+                              color: Colors.orange.shade600,
+                              size: 48,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "Belum ada alamat pengiriman",
+                              style: TextStyle(
+                                color: Colors.orange.shade800,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "Tambahkan alamat untuk melanjutkan",
+                              style: TextStyle(
+                                color: Colors.orange.shade600,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ...addresses.asMap().entries.map((entry) {
                       final idx = entry.key;
                       return Card(
@@ -305,7 +458,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                             subtitle: Text("Qty: ${item['quantity']}"),
                             trailing: Text(
-                              'Rp${NumberFormat('#,##0', 'id_ID').format((item['price'] as num) * item['quantity'])}',
+                              'Rp${_formatCurrency((item['price'] as num) * item['quantity'])}',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,

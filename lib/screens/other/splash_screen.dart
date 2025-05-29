@@ -296,7 +296,6 @@ class _SplashScreenState extends State<SplashScreen>
 
                       const SizedBox(height: 60),
 
-                      // Loading Indicator
                       FadeTransition(
                         opacity: _textFadeAnimation,
                         child: SizedBox(
