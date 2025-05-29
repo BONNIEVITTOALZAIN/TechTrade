@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:techtrade/screens/cart/cart_screen.dart';
+import 'package:techtrade/screens/favorite/favorite_screen.dart';
 import 'package:techtrade/screens/other/category_screen.dart';
 import 'package:techtrade/screens/detail/detail_screen.dart';
 import 'package:techtrade/screens/other/search_screen.dart';
@@ -99,8 +100,15 @@ class _HomeContentState extends State<HomeContent> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.black),
-            onPressed: () {},
+            icon: const Icon(Icons.favorite, color: Colors.red),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const FavoritesScreen(),
+                ),
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.shopping_cart_outlined, color: Colors.black),
