@@ -122,6 +122,7 @@ class CategoryScreen extends StatelessWidget {
                               heroTag: 'post-$index',
                               productId: docs[index].id,
                               averageRating: (data['averageRating'] ?? 0.0),
+                              condition: data['condition'],
                             ),
                       ),
                     );

@@ -264,6 +264,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                           productId: docs[index].id,
                                           averageRating:
                                               (data['averageRating'] ?? 0.0),
+                                          condition: data['condition'],
                                         ),
                                   ),
                                 );

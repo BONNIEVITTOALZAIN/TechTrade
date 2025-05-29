@@ -420,6 +420,7 @@ class _HomeContentState extends State<HomeContent> {
                                     productId: docs[index].id,
                                     averageRating:
                                         (data['averageRating'] ?? 0.0),
+                                    condition: docs[index].get('condition'),
                                   ),
                             ),
                           );
