@@ -342,7 +342,7 @@ class _AddressPageState extends State<AddressPage> {
                 const SizedBox(width: 12),
                 const Expanded(
                   child: Text(
-                    'Lokasi Anda telah berhasil disimpan ke database',
+                    'Alamat tercatat akan digunakan untuk pengiriman barang.',
                     style: TextStyle(
                       color: Colors.teal,
                       fontSize: 14,
