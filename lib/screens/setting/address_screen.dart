@@ -6,7 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 
 class AddressPage extends StatefulWidget {
-  const AddressPage({Key? key}) : super(key: key);
+  const AddressPage({super.key});
 
   @override
   State<AddressPage> createState() => _AddressPageState();
@@ -164,7 +164,7 @@ class _AddressPageState extends State<AddressPage> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: Container(
+      body: SizedBox(
         width: double.infinity,
         height: double.infinity,
         child: SafeArea(
@@ -194,7 +194,7 @@ class _AddressPageState extends State<AddressPage> {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.teal.withOpacity(0.1),
+                  color: Colors.teal.withValues(alpha: 0.1),
                   blurRadius: 20,
                   spreadRadius: 5,
                 ),
@@ -209,7 +209,7 @@ class _AddressPageState extends State<AddressPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(25),
             ),
             child: const Text(
@@ -236,7 +236,7 @@ class _AddressPageState extends State<AddressPage> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.red.withOpacity(0.1),
+              color: Colors.red.withValues(alpha: 0.1),
               blurRadius: 20,
               spreadRadius: 5,
             ),
@@ -248,7 +248,7 @@ class _AddressPageState extends State<AddressPage> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -318,16 +318,19 @@ class _AddressPageState extends State<AddressPage> {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.teal.withOpacity(0.05),
+              color: Colors.teal.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.teal.withOpacity(0.2), width: 1),
+              border: Border.all(
+                color: Colors.teal.withValues(alpha: 0.2),
+                width: 1,
+              ),
             ),
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.teal.withOpacity(0.1),
+                    color: Colors.teal.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -369,7 +372,7 @@ class _AddressPageState extends State<AddressPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.teal.withOpacity(0.08),
+            color: Colors.teal.withValues(alpha: 0.08),
             blurRadius: 20,
             spreadRadius: 0,
             offset: const Offset(0, 4),
@@ -381,7 +384,7 @@ class _AddressPageState extends State<AddressPage> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
+              color: iconColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: iconColor, size: 32),

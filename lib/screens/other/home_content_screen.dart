@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:techtrade/screens/Chat/chat_list_screen.dart';
 import 'package:techtrade/screens/cart/cart_screen.dart';
 import 'package:techtrade/screens/favorite/favorite_screen.dart';
 import 'package:techtrade/screens/other/category_screen.dart';
@@ -77,9 +78,7 @@ class _HomeContentState extends State<HomeContent> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
         elevation: 0.5,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,6 +118,15 @@ class _HomeContentState extends State<HomeContent> {
               );
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.chat_bubble_outline, color: Colors.black),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ChatListScreen()),
+              );
+            },
+          ),
         ],
       ),
       body: RefreshIndicator(
@@ -128,7 +136,6 @@ class _HomeContentState extends State<HomeContent> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Search Bar
               TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
@@ -429,6 +436,7 @@ class _HomeContentState extends State<HomeContent> {
                                     averageRating:
                                         (data['averageRating'] ?? 0.0),
                                     condition: docs[index].get('condition'),
+                                    userId: data['userId'],
                                   ),
                             ),
                           );
@@ -439,7 +447,7 @@ class _HomeContentState extends State<HomeContent> {
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
+                                color: Colors.black.withValues(alpha: 0.05),
                                 blurRadius: 4,
                                 offset: const Offset(0, 2),
                               ),
@@ -551,7 +559,7 @@ class _HomeContentState extends State<HomeContent> {
           children: [
             CircleAvatar(
               radius: 24,
-              backgroundColor: Colors.teal.withOpacity(0.1),
+              backgroundColor: Colors.teal.withValues(alpha: 0.1),
               child: Icon(icon, color: Colors.teal, size: 28),
             ),
             const SizedBox(height: 6),

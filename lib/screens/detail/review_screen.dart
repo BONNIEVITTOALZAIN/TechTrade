@@ -45,7 +45,7 @@ class ReviewScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.teal.withOpacity(0.1),
+            color: Colors.teal.withValues(alpha: (0.1)),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -62,7 +62,7 @@ class ReviewScreen extends StatelessWidget {
             ),
             child: CircleAvatar(
               radius: 28,
-              backgroundColor: Colors.teal.withOpacity(0.1),
+              backgroundColor: Colors.teal.withValues(alpha: (0.1)),
               backgroundImage:
                   photoBytes != null ? MemoryImage(photoBytes) : null,
               child:
@@ -149,7 +149,7 @@ class ReviewScreen extends StatelessWidget {
                   Icon(
                     Icons.reviews_outlined,
                     size: 80,
-                    color: Colors.teal.withOpacity(0.4),
+                    color: Colors.teal.withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 10),
                   const Text(

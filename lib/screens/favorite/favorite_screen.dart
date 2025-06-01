@@ -65,7 +65,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         Icon(
                           Icons.favorite_border,
                           size: 80,
-                          color: Colors.teal.withOpacity(0.4),
+                          color: Colors.teal.withValues(alpha: 0.4),
                         ),
                         const SizedBox(height: 10),
                         const Text(
@@ -179,7 +179,7 @@ class ProductGrid extends StatelessWidget {
                   Icon(
                     Icons.search_off_outlined,
                     size: 80,
-                    color: Colors.teal.withOpacity(0.4),
+                    color: Colors.teal.withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 10),
                   const Text(
@@ -251,6 +251,7 @@ class ProductGrid extends StatelessWidget {
                           productId: docs[index].id,
                           averageRating: (data['averageRating'] ?? 0.0),
                           condition: data['condition'],
+                          userId: data['userId'],
                         ),
                   ),
                 );
@@ -261,7 +262,7 @@ class ProductGrid extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),

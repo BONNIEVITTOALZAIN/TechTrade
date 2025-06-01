@@ -6,7 +6,7 @@ import 'package:techtrade/screens/setting/address_screen.dart';
 import 'package:techtrade/screens/setting/profile_screen.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -144,6 +144,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
+                      
                     ),
                   ],
                 ),
@@ -180,7 +181,7 @@ class _SettingsPageState extends State<SettingsPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -203,7 +204,7 @@ class _SettingsPageState extends State<SettingsPage> {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: (iconColor ?? Colors.grey[600])!.withOpacity(0.1),
+          color: (iconColor ?? Colors.grey[600])!.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon, color: iconColor ?? Colors.grey[600], size: 20),

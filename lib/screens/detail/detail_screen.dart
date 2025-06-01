@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:techtrade/screens/Chat/chat_screen.dart';
 import 'package:techtrade/screens/Checkout/checkout_screen.dart';
 import 'package:techtrade/screens/cart/cart_screen.dart';
 import 'package:techtrade/screens/detail/full_image_screen.dart';
 import 'package:techtrade/screens/detail/review_screen.dart';
+import 'package:techtrade/screens/other/seller_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class DetailScreen extends StatefulWidget {
   final List<String> imagesBase64;
@@ -25,9 +28,10 @@ class DetailScreen extends StatefulWidget {
   final String productId;
   final double averageRating;
   final String condition;
+  final String userId;
 
   const DetailScreen({
-    Key? key,
+    super.key,
     required this.imagesBase64,
     required this.description,
     required this.createdAt,
@@ -42,7 +46,8 @@ class DetailScreen extends StatefulWidget {
     required this.productId,
     required this.averageRating,
     required this.condition,
-  }) : super(key: key);
+    required this.userId,
+  });
 
   @override
   State<DetailScreen> createState() => _DetailScreenState();
@@ -52,11 +57,22 @@ class _DetailScreenState extends State<DetailScreen> {
   bool isFavorite = false;
   int currentImageIndex = 0;
   int quantity = 1;
+  String? currentUserId;
 
   @override
   void initState() {
     super.initState();
     _loadFavoriteStatus();
+    _getCurrentUserId();
+  }
+
+  void _getCurrentUserId() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        currentUserId = user.uid;
+      });
+    }
   }
 
   Future<void> _loadFavoriteStatus() async {
@@ -123,7 +139,23 @@ class _DetailScreenState extends State<DetailScreen> {
     }
   }
 
+  bool get isOwnProduct => currentUserId == widget.userId;
+
   Future<void> addToCart() async {
+    if (isOwnProduct) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            'Anda tidak dapat menambahkan produk sendiri ke keranjang',
+          ),
+          backgroundColor: Colors.teal,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+      return;
+    }
+
     final prefs = await SharedPreferences.getInstance();
     final cart = prefs.getStringList('cart') ?? [];
     final currentItem = jsonEncode({
@@ -180,6 +212,18 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   void _showQuantityBottomSheet() {
+    if (isOwnProduct) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Anda tidak dapat membeli produk sendiri'),
+          backgroundColor: Colors.teal,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+      return;
+    }
+
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -657,6 +701,38 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   Widget _buildVariantSection() {
+    if (isOwnProduct) {
+      return Container(
+        color: Colors.white,
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(top: 8),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.blue[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.blue[200]!),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.info_outline, color: Colors.blue[700], size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Ini adalah produk yang Anda jual',
+                  style: TextStyle(
+                    color: Colors.blue[700],
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.all(16),
@@ -757,53 +833,105 @@ class _DetailScreenState extends State<DetailScreen> {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 12),
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundImage:
-                        userPhotoBytes != null
-                            ? MemoryImage(userPhotoBytes)
-                            : null,
-                    child:
-                        userPhotoBytes == null
-                            ? const Icon(Icons.person_2, size: 24)
-                            : null,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.fullName,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (_) => SellerProfileScreen(
+                            sellerId: widget.userId,
+                            sellerName: widget.fullName,
+                            sellerLocation: widget.location,
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
+                    ),
+                  );
+                },
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey[200]!),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundImage:
+                            userPhotoBytes != null
+                                ? MemoryImage(userPhotoBytes)
+                                : null,
+                        child:
+                            userPhotoBytes == null
+                                ? const Icon(Icons.person_2, size: 24)
+                                : null,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(
-                              Icons.location_on_outlined,
-                              size: 14,
-                              color: Colors.grey[600],
-                            ),
-                            const SizedBox(width: 4),
                             Text(
-                              widget.location,
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 12,
+                              widget.fullName,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
                               ),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on_outlined,
+                                  size: 14,
+                                  color: Colors.grey[600],
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  widget.location,
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.teal[50],
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              'Lihat Toko',
+                              style: TextStyle(
+                                color: Colors.teal,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              size: 12,
+                              color: Colors.teal,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ],
           );
@@ -899,8 +1027,42 @@ class _DetailScreenState extends State<DetailScreen> {
       child: SafeArea(
         child: Row(
           children: [
+            if (!isOwnProduct) ...[
+              OutlinedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (_) => ChatScreen(
+                            sellerId: widget.userId,
+                            sellerName: widget.fullName,
+                            productId: widget.productId,
+                            productName: widget.itemName,
+                            productImage: widget.imagesBase64.first,
+                          ),
+                    ),
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.teal,
+                  side: const BorderSide(color: Colors.teal),
+                  padding: const EdgeInsets.all(16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  minimumSize: const Size(48, 48),
+                ),
+                child: const Icon(Icons.chat_bubble_outline, size: 20),
+              ),
+              const SizedBox(width: 8),
+            ],
+
             OutlinedButton.icon(
-              onPressed: widget.stock > 0 ? _showQuantityBottomSheet : null,
+              onPressed:
+                  (widget.stock > 0 && !isOwnProduct)
+                      ? _showQuantityBottomSheet
+                      : null,
               icon: const Icon(Icons.add_shopping_cart_outlined),
               label: const Text('Keranjang'),
               style: OutlinedButton.styleFrom(
@@ -908,7 +1070,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 side: const BorderSide(color: Colors.teal),
                 padding: const EdgeInsets.symmetric(
                   vertical: 16,
-                  horizontal: 24,
+                  horizontal: 16,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -919,7 +1081,7 @@ class _DetailScreenState extends State<DetailScreen> {
             Expanded(
               child: ElevatedButton(
                 onPressed:
-                    widget.stock > 0
+                    (widget.stock > 0 && !isOwnProduct)
                         ? () {
                           final itemsToCheckout = [
                             {
@@ -948,7 +1110,11 @@ class _DetailScreenState extends State<DetailScreen> {
                   ),
                 ),
                 child: Text(
-                  widget.stock > 0 ? 'Beli Sekarang' : 'Stok Habis',
+                  isOwnProduct
+                      ? 'Produk Anda'
+                      : widget.stock > 0
+                      ? 'Beli Sekarang'
+                      : 'Stok Habis',
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 16,

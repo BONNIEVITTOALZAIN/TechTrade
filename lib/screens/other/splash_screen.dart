@@ -13,137 +13,86 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
-  late AnimationController _logoController;
-  late AnimationController _textController;
-  late AnimationController _backgroundController;
-  late AnimationController _pulseController;
+  late AnimationController _fadeController;
+  late AnimationController _scaleController;
 
-  late Animation<double> _logoScaleAnimation;
-  late Animation<double> _logoFadeAnimation;
-  late Animation<Offset> _logoSlideAnimation;
-
-  late Animation<double> _textFadeAnimation;
-  late Animation<Offset> _textSlideAnimation;
-
-  late Animation<double> _backgroundAnimation;
-  late Animation<double> _pulseAnimation;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _progressAnimation;
 
   @override
   void initState() {
     super.initState();
     _initializeAnimations();
-    _startAnimationSequence();
+    _startAnimations();
     _navigateAfterDelay();
   }
 
   void _initializeAnimations() {
-    _logoController = AnimationController(
+    // Fade animation for logo and text
+    _fadeController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 1200),
     );
 
-    _logoScaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _logoController, curve: Curves.elasticOut),
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
 
-    _logoFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _logoController, curve: Curves.easeInOut),
-    );
-
-    _logoSlideAnimation = Tween<Offset>(
-      begin: const Offset(0, -2),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _logoController, curve: Curves.bounceOut),
-    );
-
-    _textController = AnimationController(
+    // Scale animation for logo
+    _scaleController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
 
-    _textFadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _textController, curve: Curves.easeIn));
-
-    _textSlideAnimation = Tween<Offset>(
-      begin: const Offset(0, 2),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _textController, curve: Curves.easeOutBack),
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.easeOutBack),
     );
 
-    _backgroundController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2000),
-    );
-
-    _backgroundAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _backgroundController, curve: Curves.easeInOut),
-    );
-
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    );
-
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    // Progress animation
+    _progressAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _fadeController,
+        curve: const Interval(0.5, 1.0, curve: Curves.easeInOut),
+      ),
     );
   }
 
-  void _startAnimationSequence() async {
-    _backgroundController.forward();
-
-    await Future.delayed(const Duration(milliseconds: 300));
-    _logoController.forward();
-
-    await Future.delayed(const Duration(milliseconds: 800));
-    _textController.forward();
-
-    await Future.delayed(const Duration(milliseconds: 500));
-    _pulseController.repeat(reverse: true);
+  void _startAnimations() {
+    // Delay untuk efek yang lebih smooth
+    Future.delayed(const Duration(milliseconds: 200), () {
+      _fadeController.forward();
+      _scaleController.forward();
+    });
   }
 
   void _navigateAfterDelay() {
-    Timer(const Duration(seconds: 4), () {
+    Timer(const Duration(milliseconds: 3000), () {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         Navigator.pushReplacement(
           context,
           PageRouteBuilder(
-            pageBuilder:
-                (context, animation, secondaryAnimation) => const HomeScreen(),
-            transitionsBuilder: (
-              context,
-              animation,
-              secondaryAnimation,
-              child,
-            ) {
+            pageBuilder: (context, animation, _) => const HomeScreen(),
+            transitionsBuilder: (context, animation, _, child) {
               return FadeTransition(opacity: animation, child: child);
             },
-            transitionDuration: const Duration(milliseconds: 800),
+            transitionDuration: const Duration(milliseconds: 600),
           ),
         );
       } else {
         Navigator.pushReplacement(
           context,
           PageRouteBuilder(
-            pageBuilder:
-                (context, animation, secondaryAnimation) =>
-                    const SignInScreen(),
-            transitionsBuilder: (
-              context,
-              animation,
-              secondaryAnimation,
-              child,
-            ) {
+            pageBuilder: (context, animation, _) => const SignInScreen(),
+            transitionsBuilder: (context, animation, _, child) {
               return SlideTransition(
                 position: Tween<Offset>(
-                  begin: const Offset(1.0, 0.0),
+                  begin: const Offset(0.0, 1.0),
                   end: Offset.zero,
-                ).animate(animation),
+                ).animate(
+                  CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+                ),
                 child: child,
               );
             },
@@ -156,166 +105,147 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
-    _logoController.dispose();
-    _textController.dispose();
-    _backgroundController.dispose();
-    _pulseController.dispose();
+    _fadeController.dispose();
+    _scaleController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AnimatedBuilder(
-        animation: _backgroundAnimation,
-        builder: (context, child) {
-          return Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color.lerp(
-                    Colors.teal[100],
-                    Colors.teal[300],
-                    _backgroundAnimation.value,
-                  )!,
-                  Color.lerp(
-                    Colors.teal[50],
-                    Colors.teal[200],
-                    _backgroundAnimation.value,
-                  )!,
-                  Color.lerp(
-                    Colors.white,
-                    Colors.teal[100],
-                    _backgroundAnimation.value,
-                  )!,
-                ],
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Main content area
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Logo dengan animasi scale dan fade
+                    AnimatedBuilder(
+                      animation: Listenable.merge([
+                        _fadeAnimation,
+                        _scaleAnimation,
+                      ]),
+                      builder: (context, child) {
+                        return FadeTransition(
+                          opacity: _fadeAnimation,
+                          child: ScaleTransition(
+                            scale: _scaleAnimation,
+                            child: Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(24),
+                                color: Colors.teal[500],
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.teal.withOpacity(0.25),
+                                    blurRadius: 24,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: Image.asset(
+                                  'assets/logo.png',
+                                  width: 60,
+                                  height: 60,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Brand name dengan fade animation
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Column(
+                        children: [
+                          Text(
+                            'TechTrade',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.teal[700],
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Your Tech Trading Platform',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            child: Stack(
-              children: [
-                ...List.generate(
-                  5,
-                  (index) => AnimatedBuilder(
-                    animation: _backgroundController,
-                    builder: (context, child) {
-                      return Positioned(
-                        top:
-                            (index * 150.0) -
-                            (_backgroundAnimation.value * 100),
-                        left:
-                            (index * 100.0) - (_backgroundAnimation.value * 50),
-                        child: Opacity(
-                          opacity: 0.1 * _backgroundAnimation.value,
-                          child: Container(
-                            width: 100 + (index * 20.0),
-                            height: 100 + (index * 20.0),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.teal[300],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
 
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+            // Bottom loading indicator
+            Padding(
+              padding: const EdgeInsets.only(bottom: 48),
+              child: AnimatedBuilder(
+                animation: _progressAnimation,
+                builder: (context, child) {
+                  return Column(
                     children: [
-                      SlideTransition(
-                        position: _logoSlideAnimation,
-                        child: FadeTransition(
-                          opacity: _logoFadeAnimation,
-                          child: ScaleTransition(
-                            scale: _logoScaleAnimation,
-                            child: AnimatedBuilder(
-                              animation: _pulseAnimation,
-                              builder: (context, child) {
-                                return Transform.scale(
-                                  scale: _pulseAnimation.value,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(20),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.white,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.teal.withOpacity(0.3),
-                                          blurRadius: 20,
-                                          spreadRadius: 5,
-                                        ),
-                                      ],
-                                    ),
-                                    child: Image.asset(
-                                      'assets/logo.png',
-                                      width: 120,
-                                      height: 120,
-                                    ),
-                                  ),
-                                );
-                              },
+                      // Progress bar
+                      Container(
+                        width: 120,
+                        height: 3,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Container(
+                            width: 120 * _progressAnimation.value,
+                            height: 3,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Colors.teal[400]!, Colors.teal[600]!],
+                              ),
+                              borderRadius: BorderRadius.circular(2),
                             ),
                           ),
                         ),
                       ),
 
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 16),
 
-                      SlideTransition(
-                        position: _textSlideAnimation,
-                        child: FadeTransition(
-                          opacity: _textFadeAnimation,
-                          child: Column(
-                            children: [
-                              Text(
-                                'TechTrade',
-                                style: TextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  letterSpacing: 2,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Your Tech Trading Platform',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w300,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 60),
-
+                      // Loading text
                       FadeTransition(
-                        opacity: _textFadeAnimation,
-                        child: SizedBox(
-                          width: 40,
-                          height: 40,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 3,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.teal[400]!,
-                            ),
+                        opacity: _fadeAnimation,
+                        child: Text(
+                          'Loading...',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[500],
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
                       ),
                     ],
-                  ),
-                ),
-              ],
+                  );
+                },
+              ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }

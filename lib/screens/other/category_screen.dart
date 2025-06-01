@@ -9,8 +9,7 @@ import 'package:techtrade/screens/detail/detail_screen.dart';
 class CategoryScreen extends StatelessWidget {
   final String categoryLabel;
 
-  const CategoryScreen({Key? key, required this.categoryLabel})
-    : super(key: key);
+  const CategoryScreen({super.key, required this.categoryLabel});
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +52,7 @@ class CategoryScreen extends StatelessWidget {
                   Icon(
                     Icons.search_off_outlined,
                     size: 80,
-                    color: Colors.teal.withOpacity(0.4),
+                    color: Colors.teal.withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 10),
                   const Text(
@@ -123,6 +122,7 @@ class CategoryScreen extends StatelessWidget {
                               productId: docs[index].id,
                               averageRating: (data['averageRating'] ?? 0.0),
                               condition: data['condition'],
+                              userId: data['userId'],
                             ),
                       ),
                     );
@@ -130,7 +130,7 @@ class CategoryScreen extends StatelessWidget {
                   child: Material(
                     elevation: 3,
                     borderRadius: BorderRadius.circular(12),
-                    shadowColor: Colors.teal.withOpacity(0.15),
+                    shadowColor: Colors.teal.withValues(alpha: 0.15),
                     color: Colors.white,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

@@ -8,10 +8,10 @@ class RatingScreen extends StatefulWidget {
   final String productId;
 
   const RatingScreen({
-    Key? key,
+    super.key,
     required this.itemName,
     required this.productId,
-  }) : super(key: key);
+  });
 
   @override
   _RatingScreenState createState() => _RatingScreenState();

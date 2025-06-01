@@ -281,7 +281,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                     decoration: BoxDecoration(
                       color: _getStatusColor(
                         transaction['status'] ?? 'Unknown',
-                      ).withOpacity(0.1),
+                      ).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(

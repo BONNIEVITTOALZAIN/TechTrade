@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EditProfilePage extends StatefulWidget {
-  const EditProfilePage({Key? key}) : super(key: key);
+  const EditProfilePage({super.key});
 
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
@@ -25,11 +26,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final ImagePicker _picker = ImagePicker();
   bool isLoading = false;
   String? base64Image;
+  DateTime? selectedDate; // Tambahkan variable untuk menyimpan tanggal
 
   @override
   void initState() {
     super.initState();
+    _initializeDateFormatting();
     fetchUserData();
+  }
+
+  Future<void> _initializeDateFormatting() async {
+    // Inisialisasi locale Indonesia untuk DateFormat
+    try {
+      await initializeDateFormatting('id_ID', null);
+    } catch (e) {
+      print('Failed to initialize Indonesian locale: $e');
+    }
   }
 
   Future<void> _pickImage() async {
@@ -65,7 +77,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     leading: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.teal.withOpacity(0.1),
+                        color: Colors.teal.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(Icons.camera_alt, color: Colors.teal),
@@ -84,7 +96,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     leading: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.teal.withOpacity(0.1),
+                        color: Colors.teal.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(Icons.photo, color: Colors.teal),
@@ -139,8 +151,40 @@ class _EditProfilePageState extends State<EditProfilePage> {
           _emailController.text = data['email'] ?? '';
           _nomorHpController.text = data['nomorHp'] ?? '';
           _jenisKelaminController.text = data['jenisKelamin'] ?? '';
-          _tanggalLahirController.text = data['tanggalLahir'] ?? '';
-          base64Image = data['photo'] ?? null;
+
+          // Perbaikan parsing tanggal lahir
+          String dateString = data['tanggalLahir'] ?? '';
+          if (dateString.isNotEmpty) {
+            _tanggalLahirController.text = dateString;
+            // Parse tanggal dari berbagai format
+            try {
+              // Coba parse dari format ISO
+              selectedDate = DateTime.tryParse(dateString);
+
+              // Jika gagal, coba dari format Indonesia
+              if (selectedDate == null) {
+                final formats = [
+                  DateFormat('dd MMMM yyyy', 'id_ID'),
+                  DateFormat('dd/MM/yyyy'),
+                  DateFormat('yyyy-MM-dd'),
+                  DateFormat('dd-MM-yyyy'),
+                ];
+
+                for (var format in formats) {
+                  try {
+                    selectedDate = format.parse(dateString);
+                    break;
+                  } catch (e) {
+                    continue;
+                  }
+                }
+              }
+            } catch (e) {
+              print('Error parsing date: $e');
+            }
+          }
+
+          base64Image = data['photo'] ?? '';
         }
       }
     } catch (e) {
@@ -155,6 +199,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
+        // Simpan tanggal dalam format ISO untuk konsistensi
+        String tanggalLahirISO = '';
+        if (selectedDate != null) {
+          tanggalLahirISO = selectedDate!.toIso8601String().split('T')[0];
+        }
+
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
           'fullName': _fullNameController.text,
           'userName': _userNameController.text,
@@ -163,6 +213,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           'nomorHp': _nomorHpController.text,
           'jenisKelamin': _jenisKelaminController.text,
           'tanggalLahir': _tanggalLahirController.text,
+          'tanggalLahirISO': tanggalLahirISO, // Simpan juga format ISO
           'photo': base64Image ?? '',
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
@@ -313,35 +364,77 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-  void _selectTanggalLahir() async {
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate:
-          DateTime.tryParse(_tanggalLahirController.text) ?? DateTime(2000),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Colors.teal,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
+  String _formatDate(DateTime date) {
+    try {
+      return DateFormat('dd MMMM yyyy', 'id_ID').format(date);
+    } catch (e) {
+      try {
+        return DateFormat('dd MMM yyyy').format(date);
+      } catch (e2) {
+        return DateFormat('dd/MM/yyyy').format(date);
+      }
+    }
+  }
 
-    if (picked != null) {
-      setState(() {
-        _tanggalLahirController.text = DateFormat(
-          'dd MMMM yyyy',
-          'id_ID',
-        ).format(picked);
-      });
+  void _selectTanggalLahir() async {
+    DateTime initialDate;
+    if (selectedDate != null) {
+      initialDate = selectedDate!;
+    } else if (_tanggalLahirController.text.isNotEmpty) {
+      initialDate =
+          DateTime.tryParse(_tanggalLahirController.text) ?? DateTime(2000);
+    } else {
+      initialDate = DateTime(2000);
+    }
+
+    final now = DateTime.now();
+    final firstDate = DateTime(1900);
+
+    if (initialDate.isAfter(now)) {
+      initialDate = now;
+    } else if (initialDate.isBefore(firstDate)) {
+      initialDate = DateTime(2000);
+    }
+
+    try {
+      DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: initialDate,
+        firstDate: firstDate,
+        lastDate: now,
+        helpText: 'Pilih Tanggal Lahir',
+        cancelText: 'Batal',
+        confirmText: 'OK',
+        builder: (context, child) {
+          return Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: const ColorScheme.light(
+                primary: Colors.teal,
+                onPrimary: Colors.white,
+                surface: Colors.white,
+                onSurface: Colors.black,
+              ),
+            ),
+            child: child!,
+          );
+        },
+      );
+
+      if (picked != null) {
+        setState(() {
+          selectedDate = picked;
+          _tanggalLahirController.text = _formatDate(picked);
+        });
+      }
+    } catch (e) {
+      print('Error selecting date: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Gagal memilih tanggal'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -359,7 +452,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -372,7 +465,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ? Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.teal.withOpacity(0.1),
+                    color: Colors.teal.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(icon, color: Colors.teal, size: 20),
@@ -416,7 +509,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -432,7 +525,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: Colors.teal.withOpacity(0.1),
+                    color: Colors.teal.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Icon(
@@ -490,7 +583,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 10,
                             offset: const Offset(0, 2),
                           ),
@@ -535,7 +628,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                       shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.2),
+                                          color: Colors.black.withValues(
+                                            alpha: 0.2,
+                                          ),
                                           blurRadius: 4,
                                           offset: const Offset(0, 2),
                                         ),
@@ -571,16 +666,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 20),
-
                     // Profile Info Section
                     _buildSectionCard('Info Profil', [
                       _buildItemRow(
                         'Nama Lengkap',
                         _fullNameController,
                         icon: Icons.person_outline,
-                        onTapOverride: () {},
                       ),
                       _buildItemRow(
                         'Username',
@@ -593,7 +685,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         icon: Icons.description_outlined,
                       ),
                     ]),
-
                     _buildSectionCard('Info Pribadi', [
                       _buildItemRow(
                         'E-mail',
@@ -621,7 +712,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ),
                     ]),
 
-                    // Save Button
                     Container(
                       width: double.infinity,
                       height: 50,
@@ -657,7 +747,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 ),
                       ),
                     ),
-
                     const SizedBox(height: 20),
                   ],
                 ),

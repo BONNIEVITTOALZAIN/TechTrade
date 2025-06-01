@@ -161,12 +161,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'TechTrade',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(255, 255, 255, 255),
+        ),
         useMaterial3: true,
       ),
       home: SplashScreen(),
     );
   }
 }
-
-/// fitur dark mode belum selesai

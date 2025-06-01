@@ -136,7 +136,9 @@ class _AboutScreenState extends State<AboutScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.teal.withOpacity(0.2)),
+                      border: Border.all(
+                        color: Colors.teal.withValues(alpha: 0.2),
+                      ),
                     ),
                     child: Column(
                       children: [
@@ -186,7 +188,7 @@ class _AboutScreenState extends State<AboutScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -220,7 +222,7 @@ class _AboutScreenState extends State<AboutScreen> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.teal.withOpacity(0.1),
+            color: Colors.teal.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: Colors.teal, size: 20),
@@ -264,7 +266,7 @@ class _AboutScreenState extends State<AboutScreen> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.teal.withOpacity(0.1),
+            color: Colors.teal.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: Colors.teal, size: 20),
@@ -303,7 +305,7 @@ class _AboutScreenState extends State<AboutScreen> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.teal.withOpacity(0.1),
+            color: Colors.teal.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: Colors.teal, size: 20),
