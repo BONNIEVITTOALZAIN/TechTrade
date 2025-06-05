@@ -54,6 +54,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
+      backgroundColor: Theme.of(context).cardColor,
       builder:
           (context) => Container(
             padding: const EdgeInsets.all(20),
@@ -64,14 +65,18 @@ class _AddPostScreenState extends State<AddPostScreen> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: Theme.of(context).dividerColor,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Pilih Sumber Foto',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).textTheme.titleLarge?.color,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 Row(
@@ -125,14 +130,20 @@ class _AddPostScreenState extends State<AddPostScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 20),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey[300]!),
+          border: Border.all(color: Theme.of(context).dividerColor),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           children: [
-            Icon(icon, size: 32, color: Colors.teal),
+            Icon(icon, size: 32, color: Theme.of(context).primaryColor),
             const SizedBox(height: 8),
-            Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).textTheme.bodyMedium?.color,
+              ),
+            ),
           ],
         ),
       ),
@@ -169,7 +180,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.teal,
+        backgroundColor: isError ? Colors.red : Theme.of(context).primaryColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
@@ -295,6 +306,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: Theme.of(context).cardColor,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -302,11 +314,19 @@ class _AddPostScreenState extends State<AddPostScreen> {
           children: [
             Row(
               children: [
-                Icon(Icons.camera_alt, color: Colors.teal[600], size: 20),
+                Icon(
+                  Icons.camera_alt,
+                  color: Theme.of(context).primaryColor,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
-                const Text(
+                Text(
                   'Foto Produk',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).textTheme.titleMedium?.color,
+                  ),
                 ),
                 const Spacer(),
                 Container(
@@ -332,7 +352,10 @@ class _AddPostScreenState extends State<AddPostScreen> {
             const SizedBox(height: 12),
             Text(
               'Upload foto produk dengan pencahayaan yang baik untuk menarik pembeli',
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 13,
+                color: Theme.of(context).textTheme.bodySmall?.color,
+              ),
             ),
             const SizedBox(height: 16),
             GridView.builder(
@@ -363,10 +386,13 @@ class _AddPostScreenState extends State<AddPostScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: hasImage ? Colors.teal : Colors.grey[300]!,
+            color:
+                hasImage
+                    ? Theme.of(context).primaryColor
+                    : Theme.of(context).dividerColor,
             width: hasImage ? 2 : 1,
           ),
-          color: hasImage ? null : Colors.grey[50],
+          color: hasImage ? null : Theme.of(context).cardColor,
         ),
         child:
             hasImage
@@ -410,11 +436,20 @@ class _AddPostScreenState extends State<AddPostScreen> {
                 : Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.add_a_photo, color: Colors.grey[400], size: 24),
+                    Icon(
+                      Icons.add_a_photo,
+                      color: Theme.of(
+                        context,
+                      ).iconTheme.color?.withValues(alpha: 0.6),
+                      size: 24,
+                    ),
                     const SizedBox(height: 4),
                     Text(
                       '${index + 1}',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).textTheme.bodySmall?.color,
+                      ),
                     ),
                   ],
                 ),
@@ -426,6 +461,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: Theme.of(context).cardColor,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -433,11 +469,19 @@ class _AddPostScreenState extends State<AddPostScreen> {
           children: [
             Row(
               children: [
-                Icon(Icons.edit, color: Colors.teal[600], size: 20),
+                Icon(
+                  Icons.edit,
+                  color: Theme.of(context).primaryColor,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
-                const Text(
+                Text(
                   'Informasi Produk',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).textTheme.titleMedium?.color,
+                  ),
                 ),
               ],
             ),
@@ -549,10 +593,10 @@ class _AddPostScreenState extends State<AddPostScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: Theme.of(context).textTheme.titleMedium?.color,
           ),
         ),
         const SizedBox(height: 10),
@@ -560,25 +604,36 @@ class _AddPostScreenState extends State<AddPostScreen> {
           controller: controller,
           keyboardType: keyboardType,
           maxLines: maxLines,
-          style: const TextStyle(fontSize: 16),
+          style: TextStyle(
+            fontSize: 16,
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+          ),
           decoration: InputDecoration(
             hintText: hint,
             prefixText: prefix,
             suffixText: suffix,
-            hintStyle: TextStyle(color: Colors.grey[400], fontSize: 16),
+            hintStyle: TextStyle(
+              color: Theme.of(context).textTheme.bodySmall?.color,
+              fontSize: 16,
+            ),
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor:
+                Theme.of(context).inputDecorationTheme.fillColor ??
+                Theme.of(context).cardColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderSide: BorderSide(color: Theme.of(context).dividerColor),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderSide: BorderSide(color: Theme.of(context).dividerColor),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Colors.teal, width: 2),
+              borderSide: BorderSide(
+                color: Theme.of(context).primaryColor,
+                width: 2,
+              ),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
@@ -602,10 +657,10 @@ class _AddPostScreenState extends State<AddPostScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: Theme.of(context).textTheme.titleMedium?.color,
           ),
         ),
         const SizedBox(height: 10),
@@ -613,7 +668,11 @@ class _AddPostScreenState extends State<AddPostScreen> {
           value: value,
           onChanged: onChanged,
           isExpanded: true,
-          style: const TextStyle(fontSize: 16, color: Colors.black87),
+          style: TextStyle(
+            fontSize: 16,
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+          ),
+          dropdownColor: Theme.of(context).cardColor,
           items:
               items.map((item) {
                 return DropdownMenuItem(
@@ -622,20 +681,25 @@ class _AddPostScreenState extends State<AddPostScreen> {
                 );
               }).toList(),
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, color: Colors.teal),
+            prefixIcon: Icon(icon, color: Theme.of(context).primaryColor),
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor:
+                Theme.of(context).inputDecorationTheme.fillColor ??
+                Theme.of(context).cardColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderSide: BorderSide(color: Theme.of(context).dividerColor),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderSide: BorderSide(color: Theme.of(context).dividerColor),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Colors.teal, width: 2),
+              borderSide: BorderSide(
+                color: Theme.of(context).primaryColor,
+                width: 2,
+              ),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
@@ -650,16 +714,21 @@ class _AddPostScreenState extends State<AddPostScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           "Jual Produk",
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: Theme.of(context).appBarTheme.foregroundColor,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         elevation: 1,
         centerTitle: true,
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black87),
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        iconTheme: IconThemeData(
+          color: Theme.of(context).appBarTheme.foregroundColor,
+        ),
       ),
       body: Column(
         children: [
@@ -681,10 +750,10 @@ class _AddPostScreenState extends State<AddPostScreen> {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: Theme.of(context).shadowColor.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -697,7 +766,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
             child: ElevatedButton(
               onPressed: _isUploading ? null : _submitPost,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal,
+                backgroundColor: Theme.of(context).primaryColor,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),

@@ -72,6 +72,8 @@ class _HomeContentState extends State<HomeContent> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final currencyFormat = NumberFormat.currency(
       locale: 'id_ID',
       symbol: 'Rp ',
@@ -85,15 +87,21 @@ class _HomeContentState extends State<HomeContent> {
           children: [
             Text(
               'Hai $fullName!',
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
-                color: Colors.black,
+                color: theme.appBarTheme.foregroundColor,
               ),
             ),
-            const Text(
+            Text(
               'Selamat datang di TechTrade',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 12,
+                color:
+                    theme.brightness == Brightness.light
+                        ? Colors.grey
+                        : Colors.grey[400],
+              ),
             ),
           ],
         ),
@@ -110,7 +118,10 @@ class _HomeContentState extends State<HomeContent> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.shopping_cart_outlined, color: Colors.black),
+            icon: Icon(
+              Icons.shopping_cart_outlined,
+              color: theme.appBarTheme.foregroundColor,
+            ),
             onPressed: () {
               Navigator.push(
                 context,
@@ -119,7 +130,10 @@ class _HomeContentState extends State<HomeContent> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.chat_bubble_outline, color: Colors.black),
+            icon: Icon(
+              Icons.chat_bubble_outline,
+              color: theme.appBarTheme.foregroundColor,
+            ),
             onPressed: () {
               Navigator.push(
                 context,
@@ -140,14 +154,30 @@ class _HomeContentState extends State<HomeContent> {
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: "Cari di TechTrade",
-                  prefixIcon: const Icon(Icons.search),
+                  hintStyle: TextStyle(
+                    color:
+                        theme.brightness == Brightness.light
+                            ? Colors.grey[600]
+                            : Colors.grey[400],
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color:
+                        theme.brightness == Brightness.light
+                            ? Colors.grey[600]
+                            : Colors.grey[400],
+                  ),
                   filled: true,
-                  fillColor: Colors.grey[200],
+                  fillColor:
+                      theme.brightness == Brightness.light
+                          ? Colors.grey[200]
+                          : Colors.grey[700],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
                 ),
+                style: TextStyle(color: colorScheme.onSurface),
                 textInputAction: TextInputAction.search,
                 onSubmitted: (value) {
                   if (value.trim().isNotEmpty) {
@@ -170,11 +200,20 @@ class _HomeContentState extends State<HomeContent> {
                 child:
                     bannerImages.isEmpty
                         ? Shimmer.fromColors(
-                          baseColor: Colors.grey.shade300,
-                          highlightColor: Colors.grey.shade100,
+                          baseColor:
+                              theme.brightness == Brightness.light
+                                  ? Colors.grey.shade300
+                                  : Colors.grey.shade700,
+                          highlightColor:
+                              theme.brightness == Brightness.light
+                                  ? Colors.grey.shade100
+                                  : Colors.grey.shade600,
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.grey,
+                              color:
+                                  theme.brightness == Brightness.light
+                                      ? Colors.grey
+                                      : Colors.grey[600],
                               borderRadius: BorderRadius.circular(16),
                             ),
                           ),
@@ -205,18 +244,32 @@ class _HomeContentState extends State<HomeContent> {
                                     ) {
                                       if (loadingProgress == null) return child;
                                       return Shimmer.fromColors(
-                                        baseColor: Colors.grey.shade300,
-                                        highlightColor: Colors.grey.shade100,
+                                        baseColor:
+                                            theme.brightness == Brightness.light
+                                                ? Colors.grey.shade300
+                                                : Colors.grey.shade700,
+                                        highlightColor:
+                                            theme.brightness == Brightness.light
+                                                ? Colors.grey.shade100
+                                                : Colors.grey.shade600,
                                         child: Container(
                                           width: double.infinity,
                                           height: 160,
-                                          color: Colors.grey[300],
+                                          color:
+                                              theme.brightness ==
+                                                      Brightness.light
+                                                  ? Colors.grey[300]
+                                                  : Colors.grey[600],
                                         ),
                                       );
                                     },
                                     errorBuilder:
                                         (_, __, ___) => Container(
-                                          color: Colors.grey[300],
+                                          color:
+                                              theme.brightness ==
+                                                      Brightness.light
+                                                  ? Colors.grey[300]
+                                                  : Colors.grey[600],
                                           child: const Center(
                                             child: Icon(Icons.error),
                                           ),
@@ -230,9 +283,13 @@ class _HomeContentState extends State<HomeContent> {
               const SizedBox(height: 24),
 
               // Kategori Slide Horizontal
-              const Text(
+              Text(
                 "Kategori produk",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: colorScheme.onSurface,
+                ),
               ),
               const SizedBox(height: 12),
 
@@ -269,9 +326,13 @@ class _HomeContentState extends State<HomeContent> {
               const SizedBox(height: 24),
 
               // Produk
-              const Text(
+              Text(
                 "Produk Lainnya",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: colorScheme.onSurface,
+                ),
               ),
               const SizedBox(height: 12),
 
@@ -305,11 +366,17 @@ class _HomeContentState extends State<HomeContent> {
                           ),
                       itemBuilder: (_, __) {
                         return Shimmer.fromColors(
-                          baseColor: Colors.grey.shade300,
-                          highlightColor: Colors.grey.shade100,
+                          baseColor:
+                              theme.brightness == Brightness.light
+                                  ? Colors.grey.shade300
+                                  : Colors.grey.shade700,
+                          highlightColor:
+                              theme.brightness == Brightness.light
+                                  ? Colors.grey.shade100
+                                  : Colors.grey.shade600,
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: colorScheme.surface,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Column(
@@ -322,7 +389,10 @@ class _HomeContentState extends State<HomeContent> {
                                       (3 / 5) *
                                       0.6,
                                   decoration: BoxDecoration(
-                                    color: Colors.grey,
+                                    color:
+                                        theme.brightness == Brightness.light
+                                            ? Colors.grey
+                                            : Colors.grey[600],
                                     borderRadius: const BorderRadius.vertical(
                                       top: Radius.circular(12),
                                     ),
@@ -335,7 +405,10 @@ class _HomeContentState extends State<HomeContent> {
                                   ),
                                   child: Container(
                                     height: 16,
-                                    color: Colors.grey,
+                                    color:
+                                        theme.brightness == Brightness.light
+                                            ? Colors.grey
+                                            : Colors.grey[600],
                                   ),
                                 ),
                                 const SizedBox(height: 6),
@@ -346,7 +419,10 @@ class _HomeContentState extends State<HomeContent> {
                                   child: Container(
                                     height: 16,
                                     width: 80,
-                                    color: Colors.grey,
+                                    color:
+                                        theme.brightness == Brightness.light
+                                            ? Colors.grey
+                                            : Colors.grey[600],
                                   ),
                                 ),
                                 const SizedBox(height: 6),
@@ -357,7 +433,10 @@ class _HomeContentState extends State<HomeContent> {
                                   child: Container(
                                     height: 14,
                                     width: 60,
-                                    color: Colors.grey,
+                                    color:
+                                        theme.brightness == Brightness.light
+                                            ? Colors.grey
+                                            : Colors.grey[600],
                                   ),
                                 ),
                               ],
@@ -368,8 +447,11 @@ class _HomeContentState extends State<HomeContent> {
                     );
                   }
                   if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return const Center(
-                      child: Text("Tidak ada produk ditemukan."),
+                    return Center(
+                      child: Text(
+                        "Tidak ada produk ditemukan.",
+                        style: TextStyle(color: colorScheme.onSurface),
+                      ),
                     );
                   }
 
@@ -443,11 +525,14 @@ class _HomeContentState extends State<HomeContent> {
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: colorScheme.surface,
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
+                                color:
+                                    theme.brightness == Brightness.light
+                                        ? Colors.black.withValues(alpha: 0.05)
+                                        : Colors.black.withValues(alpha: 0.3),
                                 blurRadius: 4,
                                 offset: const Offset(0, 2),
                               ),
@@ -469,9 +554,18 @@ class _HomeContentState extends State<HomeContent> {
                                             fit: BoxFit.cover,
                                           )
                                           : Container(
-                                            color: Colors.grey[200],
-                                            child: const Center(
-                                              child: Text("No Image"),
+                                            color:
+                                                theme.brightness ==
+                                                        Brightness.light
+                                                    ? Colors.grey[200]
+                                                    : Colors.grey[700],
+                                            child: Center(
+                                              child: Text(
+                                                "No Image",
+                                                style: TextStyle(
+                                                  color: colorScheme.onSurface,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                 ),
@@ -487,18 +581,19 @@ class _HomeContentState extends State<HomeContent> {
                                         itemName,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,
+                                          color: colorScheme.onSurface,
                                         ),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
                                         formattedPrice,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.teal,
+                                          color: colorScheme.primary,
                                         ),
                                       ),
                                       const SizedBox(height: 4),
@@ -513,9 +608,13 @@ class _HomeContentState extends State<HomeContent> {
                                           Expanded(
                                             child: Text(
                                               location,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 12,
-                                                color: Colors.black54,
+                                                color:
+                                                    theme.brightness ==
+                                                            Brightness.light
+                                                        ? Colors.black54
+                                                        : Colors.grey[400],
                                               ),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
@@ -543,6 +642,9 @@ class _HomeContentState extends State<HomeContent> {
   }
 
   Widget kategoriItem(String label, IconData icon) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -559,8 +661,8 @@ class _HomeContentState extends State<HomeContent> {
           children: [
             CircleAvatar(
               radius: 24,
-              backgroundColor: Colors.teal.withValues(alpha: 0.1),
-              child: Icon(icon, color: Colors.teal, size: 28),
+              backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
+              child: Icon(icon, color: colorScheme.primary, size: 28),
             ),
             const SizedBox(height: 6),
             Text(
@@ -568,7 +670,7 @@ class _HomeContentState extends State<HomeContent> {
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 12),
+              style: TextStyle(fontSize: 12, color: colorScheme.onSurface),
             ),
           ],
         ),
@@ -577,7 +679,10 @@ class _HomeContentState extends State<HomeContent> {
   }
 
   Widget filterButton(String label, String value) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final bool selected = productFilter == value;
+
     return Expanded(
       child: ElevatedButton(
         onPressed: () {
@@ -586,8 +691,14 @@ class _HomeContentState extends State<HomeContent> {
           });
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: selected ? Colors.teal : Colors.grey.shade300,
-          foregroundColor: selected ? Colors.white : Colors.black,
+          backgroundColor:
+              selected
+                  ? colorScheme.primary
+                  : (theme.brightness == Brightness.light
+                      ? Colors.grey.shade300
+                      : Colors.grey.shade700),
+          foregroundColor:
+              selected ? colorScheme.onPrimary : colorScheme.onSurface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

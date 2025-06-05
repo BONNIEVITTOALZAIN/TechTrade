@@ -20,6 +20,8 @@ class AccountPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
@@ -35,7 +37,11 @@ class AccountPage extends StatelessWidget {
                       .get(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: colorScheme.primary,
+                    ),
+                  );
                 }
 
                 final userData = snapshot.data?.data() as Map<String, dynamic>?;
@@ -66,15 +72,16 @@ class AccountPage extends StatelessWidget {
                     Expanded(
                       child: Text(
                         fullName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.settings),
-                      color: Colors.teal,
+                      color: colorScheme.primary,
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -98,10 +105,11 @@ class AccountPage extends StatelessWidget {
                 );
               },
               child: Card(
+                color: colorScheme.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                elevation: 4,
+                elevation: theme.brightness == Brightness.light ? 4 : 2,
                 margin: EdgeInsets.zero,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -119,13 +127,16 @@ class AccountPage extends StatelessWidget {
                             size: 28,
                           ),
                           const SizedBox(width: 12),
-                          const Text(
+                          Text(
                             'WishList',
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: colorScheme.onSurface,
+                            ),
                           ),
                         ],
                       ),
-                      const Icon(Icons.chevron_right, color: Colors.teal),
+                      Icon(Icons.chevron_right, color: colorScheme.primary),
                     ],
                   ),
                 ),
@@ -141,10 +152,11 @@ class AccountPage extends StatelessWidget {
                 );
               },
               child: Card(
+                color: colorScheme.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                elevation: 4,
+                elevation: theme.brightness == Brightness.light ? 4 : 2,
                 margin: EdgeInsets.zero,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -156,16 +168,25 @@ class AccountPage extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.shopping_cart_outlined,
-                            color: Colors.blueGrey,
+                            color:
+                                theme.brightness == Brightness.light
+                                    ? Colors.blueGrey
+                                    : Colors.blueGrey[300],
                             size: 28,
                           ),
                           const SizedBox(width: 12),
-                          const Text('Cart', style: TextStyle(fontSize: 16)),
+                          Text(
+                            'Cart',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
                         ],
                       ),
-                      const Icon(Icons.chevron_right, color: Colors.teal),
+                      Icon(Icons.chevron_right, color: colorScheme.primary),
                     ],
                   ),
                 ),
@@ -174,9 +195,13 @@ class AccountPage extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Rekomendasi
-            const Text(
+            Text(
               "Rekomendasi Untuk Anda",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onSurface,
+              ),
             ),
             const SizedBox(height: 12),
 
@@ -185,17 +210,31 @@ class AccountPage extends StatelessWidget {
               stream: getPostsStream(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: colorScheme.primary,
+                    ),
+                  );
                 }
                 if (snapshot.hasError) {
-                  return Center(child: Text("Error: ${snapshot.error}"));
+                  return Center(
+                    child: Text(
+                      "Error: ${snapshot.error}",
+                      style: TextStyle(color: colorScheme.onSurface),
+                    ),
+                  );
                 }
 
                 final docs = snapshot.data?.docs ?? [];
                 if (docs.isEmpty) {
-                  return const Padding(
-                    padding: EdgeInsets.all(32),
-                    child: Center(child: Text("Tidak ada produk ditemukan.")),
+                  return Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Center(
+                      child: Text(
+                        "Tidak ada produk ditemukan.",
+                        style: TextStyle(color: colorScheme.onSurface),
+                      ),
+                    ),
                   );
                 }
 
@@ -265,11 +304,14 @@ class AccountPage extends StatelessWidget {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: colorScheme.surface,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
+                              color:
+                                  theme.brightness == Brightness.light
+                                      ? Colors.black.withValues(alpha: 0.05)
+                                      : Colors.black.withValues(alpha: 0.3),
                               blurRadius: 6,
                               offset: const Offset(0, 2),
                             ),
@@ -289,9 +331,18 @@ class AccountPage extends StatelessWidget {
                                     image.isNotEmpty
                                         ? Image.memory(image, fit: BoxFit.cover)
                                         : Container(
-                                          color: Colors.grey[200],
-                                          child: const Center(
-                                            child: Text("No Image"),
+                                          color:
+                                              theme.brightness ==
+                                                      Brightness.light
+                                                  ? Colors.grey[200]
+                                                  : Colors.grey[700],
+                                          child: Center(
+                                            child: Text(
+                                              "No Image",
+                                              style: TextStyle(
+                                                color: colorScheme.onSurface,
+                                              ),
+                                            ),
                                           ),
                                         ),
                               ),
@@ -306,16 +357,17 @@ class AccountPage extends StatelessWidget {
                                       itemName,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontWeight: FontWeight.w600,
                                         fontSize: 14,
+                                        color: colorScheme.onSurface,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
                                       formattedPrice,
-                                      style: const TextStyle(
-                                        color: Colors.teal,
+                                      style: TextStyle(
+                                        color: colorScheme.primary,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14,
                                       ),
@@ -332,9 +384,13 @@ class AccountPage extends StatelessWidget {
                                         Expanded(
                                           child: Text(
                                             location,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 12,
-                                              color: Colors.black54,
+                                              color:
+                                                  theme.brightness ==
+                                                          Brightness.light
+                                                      ? Colors.black54
+                                                      : Colors.grey[400],
                                             ),
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 1,

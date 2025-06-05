@@ -13,6 +13,7 @@ class CategoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final currencyFormat = NumberFormat.currency(
       locale: 'id_ID',
       symbol: 'Rp ',
@@ -25,7 +26,6 @@ class CategoryScreen extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
-      backgroundColor: Colors.white,
       body: StreamBuilder<QuerySnapshot>(
         stream:
             FirebaseFirestore.instance
@@ -34,11 +34,18 @@ class CategoryScreen extends StatelessWidget {
                 .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(child: Text('Terjadi kesalahan: ${snapshot.error}'));
+            return Center(
+              child: Text(
+                'Terjadi kesalahan: ${snapshot.error}',
+                style: theme.textTheme.bodyMedium,
+              ),
+            );
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: Colors.teal),
+            return Center(
+              child: CircularProgressIndicator(
+                color: theme.colorScheme.primary,
+              ),
             );
           }
 
@@ -52,12 +59,14 @@ class CategoryScreen extends StatelessWidget {
                   Icon(
                     Icons.search_off_outlined,
                     size: 80,
-                    color: Colors.teal.withValues(alpha: 0.4),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
+                  Text(
                     'Produk tidak ditemukan di kategori ini.',
-                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                   ),
                 ],
               ),
@@ -130,8 +139,10 @@ class CategoryScreen extends StatelessWidget {
                   child: Material(
                     elevation: 3,
                     borderRadius: BorderRadius.circular(12),
-                    shadowColor: Colors.teal.withValues(alpha: 0.15),
-                    color: Colors.white,
+                    shadowColor: theme.colorScheme.primary.withValues(
+                      alpha: 0.15,
+                    ),
+                    color: theme.cardColor,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -146,13 +157,13 @@ class CategoryScreen extends StatelessWidget {
                                 image.isNotEmpty
                                     ? Image.memory(image, fit: BoxFit.cover)
                                     : Container(
-                                      color: Colors.grey[200],
-                                      child: const Center(
-                                        child: Icon(
-                                          Icons.image_not_supported,
-                                          color: Colors.grey,
-                                          size: 40,
-                                        ),
+                                      color: theme.colorScheme.surface
+                                          .withValues(alpha: 0.5),
+                                      child: Icon(
+                                        Icons.image_not_supported,
+                                        color: theme.colorScheme.onSurface
+                                            .withValues(alpha: 0.5),
+                                        size: 40,
                                       ),
                                     ),
                           ),
@@ -170,17 +181,16 @@ class CategoryScreen extends StatelessWidget {
                                   itemName,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: theme.textTheme.bodyMedium?.copyWith(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 14,
-                                    color: Colors.black87,
                                   ),
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
                                   formattedPrice,
-                                  style: const TextStyle(
-                                    color: Colors.teal,
+                                  style: TextStyle(
+                                    color: theme.colorScheme.primary,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,
                                   ),
@@ -199,10 +209,12 @@ class CategoryScreen extends StatelessWidget {
                                         location,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.black54,
-                                        ),
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(
+                                              fontSize: 12,
+                                              color: theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.6),
+                                            ),
                                       ),
                                     ),
                                   ],

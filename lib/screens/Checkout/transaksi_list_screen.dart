@@ -171,7 +171,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
       case 'Dikirim':
         return Colors.blue;
       case 'Selesai':
-        return Colors.teal;
+        return Theme.of(context).colorScheme.primary;
       case 'Dibatalkan':
         return Colors.red;
       default:
@@ -229,6 +229,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
   }
 
   Widget _buildTransactionCard(Map<String, dynamic> transaction) {
+    final theme = Theme.of(context);
     final items = (transaction['items'] as List<Map<String, dynamic>>?) ?? [];
 
     if (items.isEmpty) {
@@ -236,10 +237,12 @@ class _TransactionListScreenState extends State<TransactionListScreen>
         elevation: 3,
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        color: theme.cardColor,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Text(
             'No items available for transaction ${transaction['id']}',
+            style: theme.textTheme.bodyMedium,
           ),
         ),
       );
@@ -252,6 +255,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
       elevation: 3,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: theme.cardColor,
       child: InkWell(
         onTap: () => _navigateToTransactionDetail(transaction),
         borderRadius: BorderRadius.circular(16),
@@ -266,10 +270,9 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                   Expanded(
                     child: Text(
                       transaction['id'] ?? 'Unknown ID',
-                      style: const TextStyle(
+                      style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                        color: Colors.black87,
                       ),
                     ),
                   ),
@@ -318,7 +321,9 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                   Icon(
                     Icons.access_time,
                     size: 14,
-                    color: Colors.grey.shade600,
+                    color: theme.textTheme.bodySmall?.color?.withValues(
+                      alpha: 0.6,
+                    ),
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -327,7 +332,12 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                           transaction['date'] ??
                           DateTime.now(),
                     ),
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.textTheme.bodySmall?.color?.withValues(
+                        alpha: 0.6,
+                      ),
+                      fontSize: 12,
+                    ),
                   ),
                 ],
               ),
@@ -340,7 +350,10 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                     width: 50,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
+                      color:
+                          theme.brightness == Brightness.dark
+                              ? Colors.grey.shade700
+                              : Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: _buildItemImage(firstItem['image']),
@@ -352,7 +365,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                       children: [
                         Text(
                           firstItem['itemName'] ?? 'Unknown Item',
-                          style: const TextStyle(
+                          style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),
@@ -364,8 +377,10 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                           remainingCount > 0
                               ? '+ ${remainingCount} produk lainnya'
                               : 'Qty: ${firstItem['quantity'] ?? 0}',
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.textTheme.bodySmall?.color?.withValues(
+                              alpha: 0.6,
+                            ),
                             fontSize: 12,
                           ),
                         ),
@@ -377,7 +392,13 @@ class _TransactionListScreenState extends State<TransactionListScreen>
 
               const SizedBox(height: 12),
 
-              Divider(color: Colors.grey.shade300, height: 1),
+              Divider(
+                color:
+                    theme.brightness == Brightness.dark
+                        ? Colors.grey.shade600
+                        : Colors.grey.shade300,
+                height: 1,
+              ),
 
               const SizedBox(height: 12),
 
@@ -389,17 +410,19 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                     children: [
                       Text(
                         'Total Pembayaran',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.textTheme.bodySmall?.color?.withValues(
+                            alpha: 0.6,
+                          ),
                           fontSize: 12,
                         ),
                       ),
                       Text(
                         'Rp${_formatCurrency(transaction['totalPrice'] ?? 0)}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          color: Colors.teal,
+                          color: theme.colorScheme.primary,
                         ),
                       ),
                     ],
@@ -409,15 +432,19 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                       Icon(
                         Icons.local_shipping,
                         size: 14,
-                        color: Colors.grey.shade600,
+                        color: theme.textTheme.bodySmall?.color?.withValues(
+                          alpha: 0.6,
+                        ),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         transaction['selectedCourier'] ??
                             transaction['courier'] ??
                             'Unknown',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.textTheme.bodySmall?.color?.withValues(
+                            alpha: 0.6,
+                          ),
                           fontSize: 12,
                         ),
                       ),
@@ -433,6 +460,8 @@ class _TransactionListScreenState extends State<TransactionListScreen>
   }
 
   Widget _buildEmptyState() {
+    final theme = Theme.of(context);
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -440,29 +469,37 @@ class _TransactionListScreenState extends State<TransactionListScreen>
           Container(
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color:
+                  theme.brightness == Brightness.dark
+                      ? Colors.grey.shade800
+                      : Colors.grey.shade100,
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.receipt_long,
               size: 64,
-              color: Colors.grey.shade400,
+              color:
+                  theme.brightness == Brightness.dark
+                      ? Colors.grey.shade600
+                      : Colors.grey.shade400,
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'Belum Ada Transaksi',
-            style: TextStyle(
+            style: theme.textTheme.titleLarge?.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Transaksi Anda akan muncul di sini\nsetelah melakukan pembelian',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+              fontSize: 14,
+            ),
           ),
           const SizedBox(height: 24),
         ],
@@ -471,6 +508,8 @@ class _TransactionListScreenState extends State<TransactionListScreen>
   }
 
   Widget _buildErrorState() {
+    final theme = Theme.of(context);
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -478,7 +517,9 @@ class _TransactionListScreenState extends State<TransactionListScreen>
           Container(
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: Colors.red.shade50,
+              color: Colors.red.shade50.withValues(
+                alpha: theme.brightness == Brightness.dark ? 0.3 : 1.0,
+              ),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -488,19 +529,21 @@ class _TransactionListScreenState extends State<TransactionListScreen>
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'Terjadi Kesalahan',
-            style: TextStyle(
+            style: theme.textTheme.titleLarge?.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             _errorMessage ?? 'Gagal memuat data transaksi',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+              fontSize: 14,
+            ),
           ),
           const SizedBox(height: 24),
           Row(
@@ -529,17 +572,6 @@ class _TransactionListScreenState extends State<TransactionListScreen>
               ],
               ElevatedButton(
                 onPressed: _loadTransactions,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ),
                 child: const Text('Coba Lagi'),
               ),
             ],
@@ -550,17 +582,24 @@ class _TransactionListScreenState extends State<TransactionListScreen>
   }
 
   Widget _buildLoadingState() {
-    return const Center(
+    final theme = Theme.of(context);
+
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.teal),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              theme.colorScheme.primary,
+            ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Text(
             'Memuat transaksi...',
-            style: TextStyle(color: Colors.grey, fontSize: 14),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+              fontSize: 14,
+            ),
           ),
         ],
       ),
@@ -568,8 +607,14 @@ class _TransactionListScreenState extends State<TransactionListScreen>
   }
 
   Widget _buildItemImage(String? base64Image) {
+    final theme = Theme.of(context);
+
     if (base64Image == null || base64Image.isEmpty) {
-      return Icon(Icons.inventory_2, color: Colors.grey.shade600, size: 20);
+      return Icon(
+        Icons.inventory_2,
+        color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+        size: 20,
+      );
     }
 
     try {
@@ -590,7 +635,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
             print("Error loading base64 image: $error");
             return Icon(
               Icons.inventory_2,
-              color: Colors.grey.shade600,
+              color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
               size: 20,
             );
           },
@@ -598,19 +643,22 @@ class _TransactionListScreenState extends State<TransactionListScreen>
       );
     } catch (e) {
       print("Error decoding base64 image: $e");
-      return Icon(Icons.inventory_2, color: Colors.grey.shade600, size: 20);
+      return Icon(
+        Icons.inventory_2,
+        color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+        size: 20,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Riwayat Transaksi'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 1,
         centerTitle: true,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
@@ -618,7 +666,13 @@ class _TransactionListScreenState extends State<TransactionListScreen>
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                Icon(Icons.filter_list, color: Colors.grey.shade600, size: 20),
+                Icon(
+                  Icons.filter_list,
+                  color: theme.textTheme.bodyMedium?.color?.withValues(
+                    alpha: 0.6,
+                  ),
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: SingleChildScrollView(
@@ -637,13 +691,15 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                                     _selectedFilter = filter;
                                   });
                                 },
-                                backgroundColor: Colors.white,
-                                selectedColor: Colors.teal.shade100,
+                                backgroundColor: theme.cardColor,
+                                selectedColor: theme.colorScheme.primary
+                                    .withValues(alpha: 0.1),
                                 labelStyle: TextStyle(
                                   color:
                                       isSelected
-                                          ? Colors.teal.shade700
-                                          : Colors.grey.shade700,
+                                          ? theme.colorScheme.primary
+                                          : theme.textTheme.bodyMedium?.color
+                                              ?.withValues(alpha: 0.7),
                                   fontWeight:
                                       isSelected
                                           ? FontWeight.w600
@@ -652,7 +708,10 @@ class _TransactionListScreenState extends State<TransactionListScreen>
                                 side: BorderSide(
                                   color:
                                       isSelected
-                                          ? Colors.teal.shade300
+                                          ? theme.colorScheme.primary
+                                              .withValues(alpha: 0.3)
+                                          : theme.brightness == Brightness.dark
+                                          ? Colors.grey.shade600
                                           : Colors.grey.shade300,
                                 ),
                               ),
@@ -675,6 +734,7 @@ class _TransactionListScreenState extends State<TransactionListScreen>
               ? _buildEmptyState()
               : RefreshIndicator(
                 onRefresh: _refreshTransactions,
+                color: theme.colorScheme.primary,
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   itemCount: _getFilteredTransactions().length,

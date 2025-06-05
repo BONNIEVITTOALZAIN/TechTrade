@@ -22,13 +22,16 @@ class SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: colorScheme.onBackground),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -40,20 +43,28 @@ class SignUpScreenState extends State<SignUpScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   'Sign Up',
-                  style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 28.0,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onBackground,
+                  ),
                 ),
                 const SizedBox(height: 8.0),
-                const Text(
+                Text(
                   'Selamat datang di TechTrade',
-                  style: TextStyle(fontSize: 16.0),
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    color: colorScheme.onBackground.withValues(alpha: 0.7),
+                  ),
                 ),
                 const SizedBox(height: 32.0),
                 _buildTextField(
                   controller: _fullNameController,
                   label: 'Full Name',
                   icon: Icons.person_2_outlined,
+                  colorScheme: colorScheme,
                   validator:
                       (value) =>
                           value == null || value.trim().isEmpty
@@ -66,6 +77,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                   label: 'Email',
                   icon: Icons.email,
                   keyboardType: TextInputType.emailAddress,
+                  colorScheme: colorScheme,
                   validator: (value) {
                     if (value == null ||
                         value.isEmpty ||
@@ -81,11 +93,13 @@ class SignUpScreenState extends State<SignUpScreen> {
                   label: 'Password',
                   icon: Icons.lock,
                   obscureText: !_isPasswordVisible,
+                  colorScheme: colorScheme,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isPasswordVisible
                           ? Icons.visibility
                           : Icons.visibility_off,
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                     onPressed: () {
                       setState(() {
@@ -109,11 +123,13 @@ class SignUpScreenState extends State<SignUpScreen> {
                   label: 'Confirm Password',
                   icon: Icons.lock_outline,
                   obscureText: !_isConfirmPasswordVisible,
+                  colorScheme: colorScheme,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isConfirmPasswordVisible
                           ? Icons.visibility
                           : Icons.visibility_off,
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                     onPressed: () {
                       setState(() {
@@ -133,13 +149,14 @@ class SignUpScreenState extends State<SignUpScreen> {
                 ),
                 const SizedBox(height: 24.0),
                 _isLoading
-                    ? const CircularProgressIndicator()
+                    ? CircularProgressIndicator(color: colorScheme.primary)
                     : SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16.0),
-                          backgroundColor: Colors.teal,
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: colorScheme.onPrimary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.0),
                           ),
@@ -147,7 +164,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                         onPressed: _signUp,
                         child: const Text(
                           'Sign Up',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(fontSize: 16),
                         ),
                       ),
                     ),
@@ -163,6 +180,7 @@ class SignUpScreenState extends State<SignUpScreen> {
     required TextEditingController controller,
     required String label,
     required IconData icon,
+    required ColorScheme colorScheme,
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
     Widget? suffixIcon,
@@ -173,13 +191,40 @@ class SignUpScreenState extends State<SignUpScreen> {
       obscureText: obscureText,
       keyboardType: keyboardType,
       validator: validator,
+      style: TextStyle(color: colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon),
+        labelStyle: TextStyle(
+          color: colorScheme.onSurface.withValues(alpha: 0.7),
+        ),
+        prefixIcon: Icon(icon, color: colorScheme.primary),
         suffixIcon: suffixIcon,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(
+            color: colorScheme.onSurface.withValues(alpha: 0.3),
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(
+            color: colorScheme.onSurface.withValues(alpha: 0.3),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(color: colorScheme.primary),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(color: colorScheme.error),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(color: colorScheme.error),
+        ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: colorScheme.surface,
       ),
     );
   }

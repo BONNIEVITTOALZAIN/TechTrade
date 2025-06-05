@@ -61,31 +61,37 @@ class SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.background,
       body: SafeArea(
         child: Stack(
           children: [
             Container(
               height: 250,
-              decoration: const BoxDecoration(color: Colors.teal),
+              decoration: BoxDecoration(color: colorScheme.primary),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  SizedBox(height: 16),
+                children: [
+                  const SizedBox(height: 16),
                   Text(
                     'Sign In',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: colorScheme.onPrimary,
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     'Selamat datang kembali di TechTrade,\nsilahkan masuk untuk melanjutkan',
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                    style: TextStyle(
+                      color: colorScheme.onPrimary.withValues(alpha: 0.7),
+                      fontSize: 14,
+                    ),
                   ),
                 ],
               ),
@@ -93,14 +99,16 @@ class SignInScreenState extends State<SignInScreen> {
             Container(
               margin: const EdgeInsets.only(top: 200),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(32),
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black12,
+                    color: Colors.black.withValues(alpha: 0.12),
                     blurRadius: 12,
-                    offset: Offset(0, -4),
+                    offset: const Offset(0, -4),
                   ),
                 ],
               ),
@@ -113,11 +121,35 @@ class SignInScreenState extends State<SignInScreen> {
                       TextFormField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
+                        style: TextStyle(color: colorScheme.onSurface),
                         decoration: InputDecoration(
                           labelText: 'Email',
-                          prefixIcon: const Icon(Icons.email_outlined),
+                          labelStyle: TextStyle(
+                            color: colorScheme.onSurface.withValues(alpha: 0.7),
+                          ),
+                          prefixIcon: Icon(
+                            Icons.email_outlined,
+                            color: colorScheme.primary,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.3,
+                              ),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.3,
+                              ),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: colorScheme.primary),
                           ),
                         ),
                         validator: (value) {
@@ -133,17 +165,44 @@ class SignInScreenState extends State<SignInScreen> {
                       TextFormField(
                         controller: _passwordController,
                         obscureText: !_isPasswordVisible,
+                        style: TextStyle(color: colorScheme.onSurface),
                         decoration: InputDecoration(
                           labelText: 'Password',
-                          prefixIcon: const Icon(Icons.lock_outline),
+                          labelStyle: TextStyle(
+                            color: colorScheme.onSurface.withValues(alpha: 0.7),
+                          ),
+                          prefixIcon: Icon(
+                            Icons.lock_outline,
+                            color: colorScheme.primary,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.3,
+                              ),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.3,
+                              ),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: colorScheme.primary),
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isPasswordVisible
                                   ? Icons.visibility
                                   : Icons.visibility_off,
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.7,
+                              ),
                             ),
                             onPressed: () {
                               setState(() {
@@ -164,15 +223,17 @@ class SignInScreenState extends State<SignInScreen> {
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: _resetPassword,
-                          child: const Text(
+                          child: Text(
                             'Lupa Password?',
-                            style: TextStyle(color: Colors.teal),
+                            style: TextStyle(color: colorScheme.primary),
                           ),
                         ),
                       ),
                       const SizedBox(height: 8),
                       _isLoading
-                          ? const CircularProgressIndicator()
+                          ? CircularProgressIndicator(
+                            color: colorScheme.primary,
+                          )
                           : SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
@@ -180,7 +241,8 @@ class SignInScreenState extends State<SignInScreen> {
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 16,
                                 ),
-                                backgroundColor: Colors.teal,
+                                backgroundColor: colorScheme.primary,
+                                foregroundColor: colorScheme.onPrimary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -188,34 +250,52 @@ class SignInScreenState extends State<SignInScreen> {
                               onPressed: _signIn,
                               child: const Text(
                                 'Sign In',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                ),
+                                style: TextStyle(fontSize: 16),
                               ),
                             ),
                           ),
                       const SizedBox(height: 24),
                       Row(
-                        children: const [
-                          Expanded(child: Divider()),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text('ATAU'),
+                        children: [
+                          Expanded(
+                            child: Divider(
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.3,
+                              ),
+                            ),
                           ),
-                          Expanded(child: Divider()),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                            child: Text(
+                              'ATAU',
+                              style: TextStyle(
+                                color: colorScheme.onSurface.withValues(
+                                  alpha: 0.7,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Divider(
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.3,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 16),
                       RichText(
                         text: TextSpan(
-                          style: const TextStyle(color: Colors.black),
+                          style: TextStyle(color: colorScheme.onSurface),
                           children: [
                             const TextSpan(text: 'Belum punya akun? '),
                             TextSpan(
                               text: 'Sign Up',
-                              style: const TextStyle(
-                                color: Colors.teal,
+                              style: TextStyle(
+                                color: colorScheme.primary,
                                 fontWeight: FontWeight.bold,
                               ),
                               recognizer:

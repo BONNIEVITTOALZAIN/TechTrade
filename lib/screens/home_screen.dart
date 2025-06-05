@@ -26,10 +26,18 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: screens[currentIndex.clamp(0, screens.length - 1)],
       bottomNavigationBar: Container(
-        height: 50,
+        height: 45,
         decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
+          color: Theme.of(context).cardColor,
+          boxShadow: [
+            BoxShadow(
+              color:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Colors.black26
+                      : Colors.black12,
+              blurRadius: 10,
+            ),
+          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -67,12 +75,24 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: isSelected ? Colors.teal : Colors.grey, size: 24),
+          Icon(
+            icon,
+            color:
+                isSelected
+                    ? Theme.of(context).primaryColor
+                    : Theme.of(context).iconTheme.color?.withValues(alpha: 0.6),
+            size: 24,
+          ),
           const SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
-              color: isSelected ? Colors.teal : Colors.grey,
+              color:
+                  isSelected
+                      ? Theme.of(context).primaryColor
+                      : Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),

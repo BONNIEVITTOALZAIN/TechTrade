@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:techtrade/firebase_options.dart';
+import 'package:techtrade/provider/app_theme.dart';
+import 'package:techtrade/provider/theme_provider.dart';
 import 'package:techtrade/screens/other/splash_screen.dart';
 import 'package:intl/intl.dart';
 
@@ -149,7 +152,12 @@ void main() async {
 
   await setupFirebaseMessaging();
 
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -157,16 +165,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'TechTrade',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 255, 255, 255),
-        ),
-        useMaterial3: true,
-      ),
-      home: SplashScreen(),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'TechTrade',
+          themeMode: themeProvider.themeMode,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          home: SplashScreen(),
+        );
+      },
     );
   }
 }

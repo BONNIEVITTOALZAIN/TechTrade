@@ -31,21 +31,23 @@ class ReviewScreen extends StatelessWidget {
   }
 
   Widget _buildRatingTile(
+    BuildContext context,
     Map<String, dynamic> user,
     String comment,
     int ratingValue,
   ) {
+    final theme = Theme.of(context);
     final photoBytes = _decodePhoto(user['photo']);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.teal.withValues(alpha: (0.1)),
+            color: theme.primaryColor.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -58,16 +60,20 @@ class ReviewScreen extends StatelessWidget {
             padding: const EdgeInsets.all(2),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.teal, width: 1.5),
+              border: Border.all(color: theme.primaryColor, width: 1.5),
             ),
             child: CircleAvatar(
               radius: 28,
-              backgroundColor: Colors.teal.withValues(alpha: (0.1)),
+              backgroundColor: theme.primaryColor.withValues(alpha: 0.1),
               backgroundImage:
                   photoBytes != null ? MemoryImage(photoBytes) : null,
               child:
                   photoBytes == null
-                      ? Icon(Icons.person_2, size: 28, color: Colors.teal)
+                      ? Icon(
+                        Icons.person_2,
+                        size: 28,
+                        color: theme.primaryColor,
+                      )
                       : null,
             ),
           ),
@@ -78,10 +84,9 @@ class ReviewScreen extends StatelessWidget {
               children: [
                 Text(
                   user['fullName'] ?? 'Pengguna',
-                  style: const TextStyle(
+                  style: theme.textTheme.bodyLarge?.copyWith(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -93,7 +98,11 @@ class ReviewScreen extends StatelessWidget {
                           ? Icons.star_rounded
                           : Icons.star_border_rounded,
                       color:
-                          index < ratingValue ? Colors.amber : Colors.grey[300],
+                          index < ratingValue
+                              ? Colors.amber
+                              : theme.colorScheme.onSurface.withValues(
+                                alpha: 0.3,
+                              ),
                       size: 20,
                     ),
                   ),
@@ -101,9 +110,8 @@ class ReviewScreen extends StatelessWidget {
                 const SizedBox(height: 12),
                 Text(
                   comment,
-                  style: const TextStyle(
+                  style: theme.textTheme.bodyMedium?.copyWith(
                     fontSize: 14,
-                    color: Colors.black87,
                     height: 1.5,
                     fontWeight: FontWeight.w400,
                   ),
@@ -118,15 +126,20 @@ class ReviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Ulasan Produk',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        backgroundColor: Colors.white,
-        elevation: 1,
+        backgroundColor: theme.appBarTheme.backgroundColor,
+        foregroundColor: theme.appBarTheme.foregroundColor,
+        elevation: theme.appBarTheme.elevation ?? 1,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream:
@@ -136,7 +149,9 @@ class ReviewScreen extends StatelessWidget {
                 .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(color: theme.primaryColor),
+            );
           }
 
           final ratingDocs = snapshot.data!.docs;
@@ -149,12 +164,15 @@ class ReviewScreen extends StatelessWidget {
                   Icon(
                     Icons.reviews_outlined,
                     size: 80,
-                    color: Colors.teal.withValues(alpha: 0.4),
+                    color: theme.primaryColor.withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
+                  Text(
                     'Belum ada ulasan untuk produk ini.',
-                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontSize: 16,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                   ),
                 ],
               ),
@@ -175,6 +193,7 @@ class ReviewScreen extends StatelessWidget {
 
                   final user = userSnapshot.data!;
                   return _buildRatingTile(
+                    context,
                     user,
                     rating['komentar'] ?? '',
                     rating['ratingValue'] ?? 0,
@@ -198,8 +217,8 @@ class ReviewScreen extends StatelessWidget {
         },
         icon: const Icon(Icons.rate_review_outlined),
         label: const Text('Tulis Ulasan'),
-        backgroundColor: Colors.teal,
-        foregroundColor: Colors.white,
+        backgroundColor: theme.floatingActionButtonTheme.backgroundColor,
+        foregroundColor: theme.floatingActionButtonTheme.foregroundColor,
       ),
     );
   }

@@ -26,7 +26,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final ImagePicker _picker = ImagePicker();
   bool isLoading = false;
   String? base64Image;
-  DateTime? selectedDate; // Tambahkan variable untuk menyimpan tanggal
+  DateTime? selectedDate;
 
   @override
   void initState() {
@@ -36,7 +36,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _initializeDateFormatting() async {
-    // Inisialisasi locale Indonesia untuk DateFormat
     try {
       await initializeDateFormatting('id_ID', null);
     } catch (e) {
@@ -45,14 +44,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _pickImage() async {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder:
           (context) => Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
             ),
             child: SafeArea(
               child: Column(
@@ -63,27 +66,48 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: Colors.grey[300],
+                      color: isDarkMode ? Colors.grey[600] : Colors.grey[300],
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Text(
+                  Text(
                     'Pilih Foto Profil',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   ListTile(
                     leading: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.teal.withValues(alpha: 0.1),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(Icons.camera_alt, color: Colors.teal),
+                      child: Icon(
+                        Icons.camera_alt,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                     ),
-                    title: const Text('Ambil Foto'),
-                    subtitle: const Text('Gunakan kamera untuk foto baru'),
+                    title: Text(
+                      'Ambil Foto',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Gunakan kamera untuk foto baru',
+                      style: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                    ),
                     onTap: () async {
                       Navigator.pop(context);
                       final picked = await _picker.pickImage(
@@ -96,13 +120,30 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     leading: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.teal.withValues(alpha: 0.1),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(Icons.photo, color: Colors.teal),
+                      child: Icon(
+                        Icons.photo,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                     ),
-                    title: const Text('Pilih dari Galeri'),
-                    subtitle: const Text('Pilih foto dari galeri perangkat'),
+                    title: Text(
+                      'Pilih dari Galeri',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Pilih foto dari galeri perangkat',
+                      style: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                    ),
                     onTap: () async {
                       Navigator.pop(context);
                       final picked = await _picker.pickImage(
@@ -152,16 +193,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
           _nomorHpController.text = data['nomorHp'] ?? '';
           _jenisKelaminController.text = data['jenisKelamin'] ?? '';
 
-          // Perbaikan parsing tanggal lahir
           String dateString = data['tanggalLahir'] ?? '';
           if (dateString.isNotEmpty) {
             _tanggalLahirController.text = dateString;
-            // Parse tanggal dari berbagai format
             try {
-              // Coba parse dari format ISO
               selectedDate = DateTime.tryParse(dateString);
 
-              // Jika gagal, coba dari format Indonesia
               if (selectedDate == null) {
                 final formats = [
                   DateFormat('dd MMMM yyyy', 'id_ID'),
@@ -199,7 +236,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        // Simpan tanggal dalam format ISO untuk konsistensi
         String tanggalLahirISO = '';
         if (selectedDate != null) {
           tanggalLahirISO = selectedDate!.toIso8601String().split('T')[0];
@@ -213,7 +249,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           'nomorHp': _nomorHpController.text,
           'jenisKelamin': _jenisKelaminController.text,
           'tanggalLahir': _tanggalLahirController.text,
-          'tanggalLahirISO': tanggalLahirISO, // Simpan juga format ISO
+          'tanggalLahirISO': tanggalLahirISO,
           'photo': base64Image ?? '',
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
@@ -227,7 +263,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 Text('Profil berhasil diperbarui'),
               ],
             ),
-            backgroundColor: Colors.teal,
+            backgroundColor: Theme.of(context).colorScheme.primary,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -268,38 +304,63 @@ class _EditProfilePageState extends State<EditProfilePage> {
       builder: (context) {
         final tempController = TextEditingController(text: controller.text);
         return AlertDialog(
+          backgroundColor: Theme.of(context).cardColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           title: Text(
             'Edit $title',
-            style: const TextStyle(fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
           content: TextField(
             controller: tempController,
             keyboardType: inputType,
             maxLines: title == 'Bio' ? 3 : 1,
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             decoration: InputDecoration(
               labelText: title,
+              labelStyle: TextStyle(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey[300]!),
+                borderSide: BorderSide(
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[600]!
+                          : Colors.grey[300]!,
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.teal, width: 2),
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                ),
               ),
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Batal', style: TextStyle(color: Colors.grey[600])),
+              child: Text(
+                'Batal',
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(context, tempController.text),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal,
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -325,12 +386,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
       context: context,
       builder:
           (context) => AlertDialog(
+            backgroundColor: Theme.of(context).cardColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-            title: const Text(
+            title: Text(
               'Pilih Jenis Kelamin',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -342,9 +407,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             value: option,
                             groupValue: _jenisKelaminController.text,
                             onChanged: (value) => Navigator.pop(context, value),
-                            activeColor: Colors.teal,
+                            activeColor: Theme.of(context).colorScheme.primary,
                           ),
-                          title: Text(option),
+                          title: Text(
+                            option,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
                           onTap: () => Navigator.pop(context, option),
                         ),
                       )
@@ -353,7 +423,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('Batal', style: TextStyle(color: Colors.grey[600])),
+                child: Text(
+                  'Batal',
+                  style: TextStyle(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
               ),
             ],
           ),
@@ -408,11 +485,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
         builder: (context, child) {
           return Theme(
             data: Theme.of(context).copyWith(
-              colorScheme: const ColorScheme.light(
-                primary: Colors.teal,
+              colorScheme: Theme.of(context).colorScheme.copyWith(
+                primary: Theme.of(context).colorScheme.primary,
                 onPrimary: Colors.white,
-                surface: Colors.white,
-                onSurface: Colors.black,
+                surface: Theme.of(context).cardColor,
+                onSurface: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             child: child!,
@@ -445,14 +522,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
     TextInputType inputType = TextInputType.text,
     IconData? icon,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color:
+                isDarkMode
+                    ? Colors.black.withValues(alpha: 0.3)
+                    : Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -465,18 +547,26 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ? Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.teal.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(icon, color: Colors.teal, size: 20),
+                  child: Icon(
+                    icon,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 20,
+                  ),
                 )
                 : null,
         title: Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Colors.grey,
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
         subtitle: Padding(
@@ -486,14 +576,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
             style: TextStyle(
               fontSize: 16,
               color:
-                  controller.text.isEmpty ? Colors.grey[400] : Colors.black87,
+                  controller.text.isEmpty
+                      ? Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.4)
+                      : Theme.of(context).colorScheme.onSurface,
               fontStyle:
                   controller.text.isEmpty ? FontStyle.italic : FontStyle.normal,
               fontWeight: FontWeight.w500,
             ),
           ),
         ),
-        trailing: Icon(Icons.chevron_right, color: Colors.grey[400]),
+        trailing: Icon(
+          Icons.chevron_right,
+          color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
+        ),
         onTap:
             onTapOverride ??
             () => _editField(label, controller, inputType: inputType),
@@ -502,14 +599,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Widget _buildSectionCard(String title, List<Widget> children) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color:
+                isDarkMode
+                    ? Colors.black.withValues(alpha: 0.3)
+                    : Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -525,22 +627,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: Colors.teal.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Icon(
                     title == 'Info Profil' ? Icons.person_2 : Icons.info,
-                    color: Colors.teal,
+                    color: Theme.of(context).colorScheme.primary,
                     size: 16,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.teal,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ],
@@ -555,20 +659,28 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Ubah Profil',
-          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Theme.of(context).appBarTheme.foregroundColor,
+          ),
         ),
-        elevation: 0,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        elevation: Theme.of(context).appBarTheme.elevation,
       ),
       body:
           isLoading
-              ? const Center(
+              ? Center(
                 child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.teal),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).colorScheme.primary,
+                  ),
                 ),
               )
               : SingleChildScrollView(
@@ -579,11 +691,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
+                            color:
+                                isDarkMode
+                                    ? Colors.black.withValues(alpha: 0.3)
+                                    : Colors.black.withValues(alpha: 0.05),
                             blurRadius: 10,
                             offset: const Offset(0, 2),
                           ),
@@ -597,7 +712,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 onTap: _pickImage,
                                 child: CircleAvatar(
                                   radius: 50,
-                                  backgroundColor: Colors.grey[200],
+                                  backgroundColor:
+                                      isDarkMode
+                                          ? Colors.grey[700]
+                                          : Colors.grey[200],
                                   backgroundImage:
                                       (base64Image != null &&
                                               base64Image!.isNotEmpty)
@@ -611,7 +729,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                           ? Icon(
                                             Icons.person_2,
                                             size: 50,
-                                            color: Colors.grey[400],
+                                            color:
+                                                isDarkMode
+                                                    ? Colors.grey[500]
+                                                    : Colors.grey[400],
                                           )
                                           : null,
                                 ),
@@ -624,7 +745,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   child: Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: Colors.teal,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                       shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
@@ -652,7 +774,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: Colors.grey[800],
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -660,14 +782,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             'Ketuk untuk mengubah foto',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[600],
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withValues(alpha: 0.6),
                             ),
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Profile Info Section
                     _buildSectionCard('Info Profil', [
                       _buildItemRow(
                         'Nama Lengkap',
@@ -711,7 +834,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         icon: Icons.cake_outlined,
                       ),
                     ]),
-
                     Container(
                       width: double.infinity,
                       height: 50,
@@ -719,7 +841,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       child: ElevatedButton(
                         onPressed: isLoading ? null : updateUserProfile,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.teal,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),

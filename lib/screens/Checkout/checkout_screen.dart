@@ -168,13 +168,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       context: context,
       barrierDismissible: false,
       builder:
-          (context) => const AlertDialog(
+          (context) => AlertDialog(
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text("Memproses pembayaran..."),
+                CircularProgressIndicator(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Memproses pembayaran...",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
               ],
             ),
           ),
@@ -221,19 +228,42 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text("Alamat Baru"),
+            title: Text(
+              "Alamat Baru",
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+            ),
             content: TextField(
               controller: newAddressController,
-              decoration: const InputDecoration(
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+              decoration: InputDecoration(
                 hintText: "Contoh: Jl. Contoh No. 123, Kota",
-                border: OutlineInputBorder(),
+                hintStyle: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
               ),
               maxLines: 2,
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text("Batal"),
+                child: Text(
+                  "Batal",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
               ),
               ElevatedButton(
                 onPressed: addNewAddress,
@@ -267,15 +297,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     child: Row(
       children: [
         if (icon != null) ...[
-          Icon(icon, color: Colors.teal),
+          Icon(icon, color: Theme.of(context).iconTheme.color),
           const SizedBox(width: 8),
         ],
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
       ],
@@ -290,6 +320,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           style: TextStyle(
             fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
             fontSize: isTotal ? 18 : 16,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         trailing: Text(
@@ -297,7 +328,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           style: TextStyle(
             fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
             fontSize: isTotal ? 18 : 16,
-            color: isTotal ? Colors.teal.shade700 : Colors.black87,
+            color:
+                isTotal
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurface,
           ),
         ),
       );
@@ -319,16 +353,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Checkout'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 1,
-      ),
+      appBar: AppBar(title: const Text('Checkout')),
       body:
           isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? Center(
+                child: CircularProgressIndicator(
+                  color: theme.colorScheme.primary,
+                ),
+              )
               : SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -377,24 +412,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       final idx = entry.key;
                       return Card(
                         elevation: selectedAddressIndex == idx ? 3 : 1,
+                        color: theme.cardColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                           side: BorderSide(
                             color:
                                 selectedAddressIndex == idx
-                                    ? Colors.teal
-                                    : Colors.grey.shade300,
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.onSurface.withValues(
+                                      alpha: 0.3,
+                                    ),
                             width: selectedAddressIndex == idx ? 2 : 1,
                           ),
                         ),
-                        color:
-                            selectedAddressIndex == idx
-                                ? Colors.teal.shade50
-                                : Colors.white,
                         margin: const EdgeInsets.symmetric(vertical: 6),
                         child: RadioListTile<int>(
                           value: idx,
                           groupValue: selectedAddressIndex,
+                          activeColor: theme.colorScheme.primary,
                           onChanged:
                               (val) => setState(
                                 () => selectedAddressIndex = val ?? 0,
@@ -402,10 +437,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           title: Text(
                             entry.value,
                             style: TextStyle(
-                              color:
-                                  selectedAddressIndex == idx
-                                      ? Colors.teal.shade900
-                                      : Colors.black87,
+                              color: theme.colorScheme.onSurface,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -419,7 +451,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         icon: const Icon(Icons.add_location_alt),
                         label: const Text("Tambah Alamat Baru"),
                         style: TextButton.styleFrom(
-                          foregroundColor: Colors.teal.shade700,
+                          foregroundColor: theme.colorScheme.primary,
                           textStyle: const TextStyle(
                             fontWeight: FontWeight.w600,
                           ),
@@ -432,6 +464,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       icon: Icons.shopping_bag,
                     ),
                     Card(
+                      color: theme.cardColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -441,7 +474,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: widget.items.length,
-                        separatorBuilder: (_, __) => const Divider(height: 1),
+                        separatorBuilder:
+                            (_, __) => Divider(
+                              height: 1,
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.2,
+                              ),
+                            ),
                         itemBuilder: (context, index) {
                           final item = widget.items[index];
                           return ListTile(
@@ -451,18 +490,26 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                             title: Text(
                               item['itemName'],
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
+                                color: theme.colorScheme.onSurface,
                               ),
                             ),
-                            subtitle: Text("Qty: ${item['quantity']}"),
+                            subtitle: Text(
+                              "Qty: ${item['quantity']}",
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.7,
+                                ),
+                              ),
+                            ),
                             trailing: Text(
                               'Rp${_formatCurrency((item['price'] as num) * item['quantity'])}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
-                                color: Colors.teal,
+                                color: theme.colorScheme.primary,
                               ),
                             ),
                           );
@@ -475,11 +522,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ),
                     DropdownButtonFormField<String>(
                       value: selectedCourier,
+                      style: TextStyle(color: theme.colorScheme.onSurface),
+                      dropdownColor: theme.cardColor,
                       items:
                           couriers
                               .map(
-                                (c) =>
-                                    DropdownMenuItem(value: c, child: Text(c)),
+                                (c) => DropdownMenuItem(
+                                  value: c,
+                                  child: Text(
+                                    c,
+                                    style: TextStyle(
+                                      color: theme.colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ),
                               )
                               .toList(),
                       onChanged:
@@ -487,6 +543,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: theme.colorScheme.primary,
+                          ),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
@@ -501,6 +566,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ),
                     Card(
                       elevation: 3,
+                      color: theme.cardColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -518,7 +584,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               "Ongkir - $selectedCourier",
                               shippingCost,
                             ),
-                            const Divider(height: 32, thickness: 1.2),
+                            Divider(
+                              height: 32,
+                              thickness: 1.2,
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.2,
+                              ),
+                            ),
                             _buildCostTile(
                               "Total Bayar",
                               totalPrice,
@@ -533,25 +605,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
-        color: Colors.white,
+        color: theme.scaffoldBackgroundColor,
         child: ElevatedButton(
           onPressed: checkout,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.teal.shade700,
             padding: const EdgeInsets.symmetric(vertical: 18),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
             elevation: 5,
-            shadowColor: Colors.black,
           ),
           child: const Text(
             "Bayar Sekarang",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
       ),

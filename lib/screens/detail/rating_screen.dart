@@ -133,20 +133,25 @@ class _RatingScreenState extends State<RatingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Beri Rating Produk'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
+        title: Text('Beri Rating Produk', style: theme.textTheme.titleLarge),
+        backgroundColor: theme.appBarTheme.backgroundColor,
+        foregroundColor: theme.appBarTheme.foregroundColor,
+        elevation: theme.appBarTheme.elevation ?? 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView(
           children: [
-            const Text(
+            Text(
               'Pilih rating Anda:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 10),
             Row(
@@ -168,34 +173,64 @@ class _RatingScreenState extends State<RatingScreen> {
                   ? 'Anda memberi rating: $_rating bintang'
                   : 'Belum ada rating yang dipilih',
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontSize: 16,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
             ),
             const SizedBox(height: 30),
-            const Text(
+            Text(
               'Tulis ulasan (wajib):',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: _komentarController,
               maxLines: 4,
-              decoration: const InputDecoration(
+              style: theme.textTheme.bodyMedium,
+              decoration: InputDecoration(
                 hintText: 'Bagikan pendapat Anda tentang produk ini...',
-                border: OutlineInputBorder(),
+                hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: theme.primaryColor, width: 2),
+                ),
+                filled: true,
+                fillColor: theme.colorScheme.surface,
               ),
             ),
             const SizedBox(height: 30),
             _isSubmitting
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(
+                  child: CircularProgressIndicator(color: theme.primaryColor),
+                )
                 : ElevatedButton(
                   onPressed: _submitReview,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    textStyle: const TextStyle(fontSize: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                  style: theme.elevatedButtonTheme.style?.copyWith(
+                    padding: WidgetStateProperty.all(
+                      const EdgeInsets.symmetric(vertical: 15),
+                    ),
+                    textStyle: WidgetStateProperty.all(
+                      theme.textTheme.titleMedium?.copyWith(fontSize: 18),
+                    ),
+                    shape: WidgetStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
                   child: const Text('Kirim Rating'),

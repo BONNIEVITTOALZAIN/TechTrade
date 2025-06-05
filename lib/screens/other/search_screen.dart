@@ -33,7 +33,10 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
   }
 
   Widget filterButton(String label, String value) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final isSelected = selectedFilter == value;
+
     return OutlinedButton(
       onPressed: () {
         setState(() {
@@ -41,15 +44,15 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
         });
       },
       style: OutlinedButton.styleFrom(
-        backgroundColor: isSelected ? Colors.teal : Colors.white,
-        side: const BorderSide(color: Colors.teal),
+        backgroundColor: isSelected ? colorScheme.primary : colorScheme.surface,
+        side: BorderSide(color: colorScheme.primary),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
       child: Text(
         label,
         style: TextStyle(
-          color: isSelected ? Colors.white : Colors.teal,
+          color: isSelected ? colorScheme.onPrimary : colorScheme.primary,
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -58,6 +61,8 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final keywordLower = _currentKeyword.toLowerCase();
     final currencyFormat = NumberFormat.currency(
       locale: 'id_ID',
@@ -67,31 +72,59 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 1,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: Icon(
+            Icons.arrow_back,
+            color: theme.appBarTheme.foregroundColor,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Container(
           height: 40,
           decoration: BoxDecoration(
-            color: Colors.grey.shade100,
+            color:
+                theme.brightness == Brightness.dark
+                    ? Colors.grey.shade800
+                    : Colors.grey.shade100,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade400),
+            border: Border.all(
+              color:
+                  theme.brightness == Brightness.dark
+                      ? Colors.grey.shade600
+                      : Colors.grey.shade400,
+            ),
           ),
           child: TextField(
             controller: _searchController,
             autofocus: true,
             decoration: InputDecoration(
               hintText: 'Cari produk...',
-              hintStyle: TextStyle(color: Colors.grey.shade600),
+              hintStyle: TextStyle(
+                color:
+                    theme.brightness == Brightness.dark
+                        ? Colors.grey.shade400
+                        : Colors.grey.shade600,
+              ),
               border: InputBorder.none,
-              prefixIcon: const Icon(Icons.search, color: Colors.grey),
+              prefixIcon: Icon(
+                Icons.search,
+                color:
+                    theme.brightness == Brightness.dark
+                        ? Colors.grey.shade400
+                        : Colors.grey,
+              ),
               suffixIcon:
                   _searchController.text.isNotEmpty
                       ? IconButton(
-                        icon: const Icon(Icons.clear, color: Colors.grey),
+                        icon: Icon(
+                          Icons.clear,
+                          color:
+                              theme.brightness == Brightness.dark
+                                  ? Colors.grey.shade400
+                                  : Colors.grey,
+                        ),
                         onPressed: () {
                           _searchController.clear();
                           setState(() {
@@ -102,8 +135,8 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                       : null,
               contentPadding: const EdgeInsets.symmetric(vertical: 10),
             ),
-            style: const TextStyle(fontSize: 16, color: Colors.black87),
-            cursorColor: Colors.teal,
+            style: TextStyle(fontSize: 16, color: colorScheme.onSurface),
+            cursorColor: colorScheme.primary,
             textInputAction: TextInputAction.search,
             onSubmitted: (value) {
               setState(() {
@@ -120,10 +153,16 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
       ),
       body:
           _currentKeyword.isEmpty
-              ? const Center(
+              ? Center(
                 child: Text(
                   "Masukkan kata pencarian...",
-                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color:
+                        theme.brightness == Brightness.dark
+                            ? Colors.grey.shade400
+                            : Colors.black54,
+                  ),
                 ),
               )
               : Column(
@@ -156,8 +195,10 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                               .snapshots(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: colorScheme.primary,
+                            ),
                           );
                         }
 
@@ -187,12 +228,15 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                         }
 
                         if (filteredDocs.isEmpty) {
-                          return const Center(
+                          return Center(
                             child: Text(
                               "Tidak ada produk ditemukan.",
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.black54,
+                                color:
+                                    theme.brightness == Brightness.dark
+                                        ? Colors.grey.shade400
+                                        : Colors.black54,
                               ),
                             ),
                           );
@@ -272,13 +316,18 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                               },
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: colorScheme.surface,
                                   borderRadius: BorderRadius.circular(12),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.05,
-                                      ),
+                                      color:
+                                          theme.brightness == Brightness.dark
+                                              ? Colors.black.withValues(
+                                                alpha: 0.3,
+                                              )
+                                              : Colors.black.withValues(
+                                                alpha: 0.05,
+                                              ),
                                       blurRadius: 6,
                                       offset: const Offset(0, 2),
                                     ),
@@ -301,9 +350,25 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                                   fit: BoxFit.cover,
                                                 )
                                                 : Container(
-                                                  color: Colors.grey[200],
-                                                  child: const Center(
-                                                    child: Text("No Image"),
+                                                  color:
+                                                      theme.brightness ==
+                                                              Brightness.dark
+                                                          ? Colors.grey[700]
+                                                          : Colors.grey[200],
+                                                  child: Center(
+                                                    child: Text(
+                                                      "No Image",
+                                                      style: TextStyle(
+                                                        color:
+                                                            theme.brightness ==
+                                                                    Brightness
+                                                                        .dark
+                                                                ? Colors
+                                                                    .grey[400]
+                                                                : Colors
+                                                                    .grey[600],
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
                                       ),
@@ -319,16 +384,17 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                               itemName,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: 14,
+                                                color: colorScheme.onSurface,
                                               ),
                                             ),
                                             const SizedBox(height: 4),
                                             Text(
                                               formattedPrice,
-                                              style: const TextStyle(
-                                                color: Colors.teal,
+                                              style: TextStyle(
+                                                color: colorScheme.primary,
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 14,
                                               ),
@@ -345,9 +411,16 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                                 Expanded(
                                                   child: Text(
                                                     location,
-                                                    style: const TextStyle(
+                                                    style: TextStyle(
                                                       fontSize: 12,
-                                                      color: Colors.black54,
+                                                      color:
+                                                          theme.brightness ==
+                                                                  Brightness
+                                                                      .dark
+                                                              ? Colors
+                                                                  .grey
+                                                                  .shade400
+                                                              : Colors.black54,
                                                     ),
                                                     overflow:
                                                         TextOverflow.ellipsis,

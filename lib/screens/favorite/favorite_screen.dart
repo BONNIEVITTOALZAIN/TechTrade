@@ -44,6 +44,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Wishlist')),
       body: SingleChildScrollView(
@@ -52,9 +54,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Produk Wishlist',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 8),
               favoriteItems.isEmpty
@@ -65,12 +70,17 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         Icon(
                           Icons.favorite_border,
                           size: 80,
-                          color: Colors.teal.withValues(alpha: 0.4),
+                          color: theme.primaryColor.withValues(alpha: 0.4),
                         ),
                         const SizedBox(height: 10),
-                        const Text(
+                        Text(
                           'Belum ada produk favorit',
-                          style: TextStyle(fontSize: 16, color: Colors.black54),
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontSize: 16,
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.6,
+                            ),
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -98,6 +108,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       return Card(
                         margin: const EdgeInsets.symmetric(vertical: 8.0),
                         elevation: 4.0,
+                        color: theme.cardColor,
                         child: ListTile(
                           contentPadding: const EdgeInsets.all(16.0),
                           leading:
@@ -111,24 +122,33 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                   : Container(
                                     width: 50,
                                     height: 50,
-                                    color: Colors.grey[300],
-                                    child: const Icon(
+                                    color: theme.colorScheme.surface,
+                                    child: Icon(
                                       Icons.image_not_supported,
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.6),
                                     ),
                                   ),
                           title: Text(
                             itemName,
-                            style: const TextStyle(fontSize: 18),
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              fontSize: 18,
+                            ),
                           ),
                           subtitle: Text(
                             formattedPrice,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              color: Colors.teal,
+                              color: theme.primaryColor,
                             ),
                           ),
                           trailing: IconButton(
-                            icon: const Icon(Icons.remove_circle_outline),
+                            icon: Icon(
+                              Icons.remove_circle_outline,
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.7,
+                              ),
+                            ),
                             onPressed: () async {
                               await _removeFavoriteAt(index);
                             },
@@ -138,9 +158,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     },
                   ),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'Baru Diupload',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 12),
               ProductGrid(stream: getPostsStream()),
@@ -158,14 +181,23 @@ class ProductGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return StreamBuilder<QuerySnapshot>(
       stream: stream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+            child: CircularProgressIndicator(color: theme.primaryColor),
+          );
         }
         if (snapshot.hasError) {
-          return Center(child: Text("Error: ${snapshot.error}"));
+          return Center(
+            child: Text(
+              "Error: ${snapshot.error}",
+              style: theme.textTheme.bodyLarge,
+            ),
+          );
         }
 
         final docs = snapshot.data?.docs ?? [];
@@ -179,12 +211,15 @@ class ProductGrid extends StatelessWidget {
                   Icon(
                     Icons.search_off_outlined,
                     size: 80,
-                    color: Colors.teal.withValues(alpha: 0.4),
+                    color: theme.primaryColor.withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
+                  Text(
                     "Tidak ada produk ditemukan.",
-                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontSize: 16,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -258,11 +293,13 @@ class ProductGrid extends StatelessWidget {
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: theme.cardColor,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
+                      color: theme.colorScheme.onSurface.withValues(
+                        alpha: 0.05,
+                      ),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -282,8 +319,17 @@ class ProductGrid extends StatelessWidget {
                             image.isNotEmpty
                                 ? Image.memory(image, fit: BoxFit.cover)
                                 : Container(
-                                  color: Colors.grey[200],
-                                  child: const Center(child: Text("No Image")),
+                                  color: theme.colorScheme.surface,
+                                  child: Center(
+                                    child: Text(
+                                      "No Image",
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            color: theme.colorScheme.onSurface
+                                                .withValues(alpha: 0.6),
+                                          ),
+                                    ),
+                                  ),
                                 ),
                       ),
                     ),
@@ -297,7 +343,7 @@ class ProductGrid extends StatelessWidget {
                               itemName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: theme.textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
                               ),
@@ -305,8 +351,8 @@ class ProductGrid extends StatelessWidget {
                             const SizedBox(height: 4),
                             Text(
                               formattedPrice,
-                              style: const TextStyle(
-                                color: Colors.teal,
+                              style: TextStyle(
+                                color: theme.primaryColor,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
                               ),
@@ -323,9 +369,10 @@ class ProductGrid extends StatelessWidget {
                                 Expanded(
                                   child: Text(
                                     location,
-                                    style: const TextStyle(
+                                    style: theme.textTheme.bodyMedium?.copyWith(
                                       fontSize: 12,
-                                      color: Colors.black54,
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.6),
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,

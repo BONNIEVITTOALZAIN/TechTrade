@@ -112,7 +112,7 @@ class _DetailScreenState extends State<DetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Produk ditambahkan ke favorit'),
-            backgroundColor: Colors.teal,
+            backgroundColor: Theme.of(context).colorScheme.primary,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
@@ -148,7 +148,7 @@ class _DetailScreenState extends State<DetailScreen> {
           content: const Text(
             'Anda tidak dapat menambahkan produk sendiri ke keranjang',
           ),
-          backgroundColor: Colors.teal,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
@@ -194,12 +194,12 @@ class _DetailScreenState extends State<DetailScreen> {
               ? 'Jumlah produk di keranjang diperbarui'
               : 'Produk ditambahkan ke keranjang',
         ),
-        backgroundColor: Colors.teal,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         action: SnackBarAction(
           label: 'LIHAT',
-          textColor: Colors.white,
+          textColor: Theme.of(context).colorScheme.onPrimary,
           onPressed: () {
             Navigator.push(
               context,
@@ -216,7 +216,7 @@ class _DetailScreenState extends State<DetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Anda tidak dapat membeli produk sendiri'),
-          backgroundColor: Colors.teal,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
@@ -226,6 +226,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
     showModalBottomSheet(
       context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -241,7 +242,10 @@ class _DetailScreenState extends State<DetailScreen> {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: Colors.grey[300],
+                      color:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[600]
+                              : Colors.grey[300],
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -264,17 +268,18 @@ class _DetailScreenState extends State<DetailScreen> {
                           children: [
                             Text(
                               widget.itemName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
                               'Rp ${NumberFormat('#,##0', 'id_ID').format(widget.price)}',
-                              style: const TextStyle(
-                                color: Colors.teal,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
@@ -282,7 +287,11 @@ class _DetailScreenState extends State<DetailScreen> {
                             Text(
                               'Stok: ${widget.stock}',
                               style: TextStyle(
-                                color: Colors.grey[600],
+                                color:
+                                    Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.grey[400]
+                                        : Colors.grey[600],
                                 fontSize: 12,
                               ),
                             ),
@@ -295,11 +304,12 @@ class _DetailScreenState extends State<DetailScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Jumlah',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       Row(
@@ -314,7 +324,13 @@ class _DetailScreenState extends State<DetailScreen> {
                                     : null,
                             icon: const Icon(Icons.remove),
                             style: IconButton.styleFrom(
-                              backgroundColor: Colors.grey[200],
+                              backgroundColor:
+                                  Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.grey[700]
+                                      : Colors.grey[200],
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.onSurface,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -325,9 +341,10 @@ class _DetailScreenState extends State<DetailScreen> {
                             alignment: Alignment.center,
                             child: Text(
                               quantity.toString(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ),
@@ -341,8 +358,11 @@ class _DetailScreenState extends State<DetailScreen> {
                                     : null,
                             icon: const Icon(Icons.add),
                             style: IconButton.styleFrom(
-                              backgroundColor: Colors.teal[100],
-                              foregroundColor: Colors.teal,
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.2),
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.primary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -361,8 +381,9 @@ class _DetailScreenState extends State<DetailScreen> {
                         addToCart();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal,
-                        foregroundColor: Colors.white,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -389,7 +410,7 @@ class _DetailScreenState extends State<DetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: CustomScrollView(
         slivers: [
           _buildSliverAppBar(),
@@ -413,8 +434,8 @@ class _DetailScreenState extends State<DetailScreen> {
 
   Widget _buildSliverAppBar() {
     return SliverAppBar(
-      backgroundColor: Colors.white,
-      foregroundColor: Colors.black,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      foregroundColor: Theme.of(context).colorScheme.onSurface,
       elevation: 0,
       floating: true,
       pinned: false,
@@ -422,7 +443,12 @@ class _DetailScreenState extends State<DetailScreen> {
         IconButton(
           icon: Icon(
             isFavorite ? Icons.favorite : Icons.favorite_border,
-            color: isFavorite ? Colors.red : Colors.grey[600],
+            color:
+                isFavorite
+                    ? Colors.red
+                    : Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
           ),
           onPressed: toggleFavorite,
         ),
@@ -442,7 +468,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
   Widget _buildImageCarousel() {
     return Container(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       child: Column(
         children: [
           CarouselSlider(
@@ -482,11 +508,17 @@ class _DetailScreenState extends State<DetailScreen> {
                     return Container(
                       width: double.infinity,
                       height: 300,
-                      color: Colors.grey[200],
+                      color:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[800]
+                              : Colors.grey[200],
                       child: Icon(
                         Icons.broken_image,
                         size: 80,
-                        color: Colors.grey[400],
+                        color:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey[600]
+                                : Colors.grey[400],
                       ),
                     );
                   }
@@ -506,7 +538,10 @@ class _DetailScreenState extends State<DetailScreen> {
                         borderRadius: BorderRadius.circular(4),
                         color:
                             currentImageIndex == entry.key
-                                ? Colors.teal
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context).brightness ==
+                                    Brightness.dark
+                                ? Colors.grey[600]
                                 : Colors.grey[300],
                       ),
                     );
@@ -521,7 +556,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
   Widget _buildProductHeader() {
     return Container(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(top: 8),
       child: Column(
@@ -529,10 +564,11 @@ class _DetailScreenState extends State<DetailScreen> {
         children: [
           Text(
             widget.itemName,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               height: 1.3,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 12),
@@ -540,27 +576,38 @@ class _DetailScreenState extends State<DetailScreen> {
             children: [
               Text(
                 'Rp ${NumberFormat('#,##0', 'id_ID').format(widget.price)}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.teal,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: widget.stock > 0 ? Colors.teal[50] : Colors.red[50],
+                  color:
+                      widget.stock > 0
+                          ? Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.1)
+                          : Colors.red.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: widget.stock > 0 ? Colors.teal : Colors.red,
+                    color:
+                        widget.stock > 0
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.red,
                     width: 1,
                   ),
                 ),
                 child: Text(
                   widget.stock > 0 ? 'Stok: ${widget.stock}' : 'Habis',
                   style: TextStyle(
-                    color: widget.stock > 0 ? Colors.teal : Colors.red,
+                    color:
+                        widget.stock > 0
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.red,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -574,7 +621,7 @@ class _DetailScreenState extends State<DetailScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.blue[50],
+                  color: Colors.blue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -601,7 +648,7 @@ class _DetailScreenState extends State<DetailScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.purple[50],
+                  color: Colors.purple.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -633,7 +680,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
   Widget _buildRatingAndReviews() {
     return Container(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(top: 8),
       child: InkWell(
@@ -676,21 +723,29 @@ class _DetailScreenState extends State<DetailScreen> {
                 const SizedBox(width: 8),
                 Text(
                   widget.averageRating.toStringAsFixed(1),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 16,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(width: 4),
                 Text(
                   '($reviewCount ulasan)',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                  style: TextStyle(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
+                    fontSize: 14,
+                  ),
                 ),
                 const Spacer(),
                 Icon(
                   Icons.arrow_forward_ios,
                   size: 16,
-                  color: Colors.grey[400],
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.4),
                 ),
               ],
             );
@@ -703,15 +758,15 @@ class _DetailScreenState extends State<DetailScreen> {
   Widget _buildVariantSection() {
     if (isOwnProduct) {
       return Container(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         padding: const EdgeInsets.all(16),
         margin: const EdgeInsets.only(top: 8),
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.blue[50],
+            color: Colors.blue.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.blue[200]!),
+            border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
@@ -734,22 +789,31 @@ class _DetailScreenState extends State<DetailScreen> {
     }
 
     return Container(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(top: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Atur Jumlah',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
           const SizedBox(height: 12),
           Row(
             children: [
               Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey[300]!),
+                  border: Border.all(
+                    color:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey[600]!
+                            : Colors.grey[300]!,
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -759,7 +823,11 @@ class _DetailScreenState extends State<DetailScreen> {
                           quantity > 1
                               ? () => setState(() => quantity--)
                               : null,
-                      icon: const Icon(Icons.remove, size: 16),
+                      icon: Icon(
+                        Icons.remove,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                       constraints: const BoxConstraints(
                         minWidth: 36,
                         minHeight: 36,
@@ -770,9 +838,10 @@ class _DetailScreenState extends State<DetailScreen> {
                       alignment: Alignment.center,
                       child: Text(
                         quantity.toString(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
@@ -781,7 +850,11 @@ class _DetailScreenState extends State<DetailScreen> {
                           quantity < widget.stock
                               ? () => setState(() => quantity++)
                               : null,
-                      icon: const Icon(Icons.add, size: 16),
+                      icon: Icon(
+                        Icons.add,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                       constraints: const BoxConstraints(
                         minWidth: 36,
                         minHeight: 36,
@@ -793,7 +866,12 @@ class _DetailScreenState extends State<DetailScreen> {
               const SizedBox(width: 12),
               Text(
                 'Maksimal ${widget.stock} pcs',
-                style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
+                  fontSize: 12,
+                ),
               ),
             ],
           ),
@@ -804,7 +882,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
   Widget _buildSellerInfo() {
     return Container(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(top: 8),
       child: StreamBuilder<QuerySnapshot>(
@@ -828,9 +906,13 @@ class _DetailScreenState extends State<DetailScreen> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Informasi Penjual',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               const SizedBox(height: 12),
               InkWell(
@@ -851,20 +933,32 @@ class _DetailScreenState extends State<DetailScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[200]!),
+                    border: Border.all(
+                      color:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[600]!
+                              : Colors.grey[200]!,
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     children: [
                       CircleAvatar(
                         radius: 24,
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.1),
                         backgroundImage:
                             userPhotoBytes != null
                                 ? MemoryImage(userPhotoBytes)
                                 : null,
                         child:
                             userPhotoBytes == null
-                                ? const Icon(Icons.person_2, size: 24)
+                                ? Icon(
+                                  Icons.person_2,
+                                  size: 24,
+                                  color: Theme.of(context).colorScheme.primary,
+                                )
                                 : null,
                       ),
                       const SizedBox(width: 12),
@@ -874,9 +968,10 @@ class _DetailScreenState extends State<DetailScreen> {
                           children: [
                             Text(
                               widget.fullName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -885,13 +980,17 @@ class _DetailScreenState extends State<DetailScreen> {
                                 Icon(
                                   Icons.location_on_outlined,
                                   size: 14,
-                                  color: Colors.grey[600],
+                                  color: Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.6),
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   widget.location,
                                   style: TextStyle(
-                                    color: Colors.grey[600],
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.6),
                                     fontSize: 12,
                                   ),
                                 ),
@@ -906,16 +1005,18 @@ class _DetailScreenState extends State<DetailScreen> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.teal[50],
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text(
+                            Text(
                               'Lihat Toko',
                               style: TextStyle(
-                                color: Colors.teal,
+                                color: Theme.of(context).colorScheme.primary,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -924,7 +1025,7 @@ class _DetailScreenState extends State<DetailScreen> {
                             Icon(
                               Icons.arrow_forward_ios,
                               size: 12,
-                              color: Colors.teal,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                           ],
                         ),
@@ -946,15 +1047,19 @@ class _DetailScreenState extends State<DetailScreen> {
     ).format(widget.createdAt);
 
     return Container(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(top: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Detail Produk',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
           const SizedBox(height: 12),
           _buildDetailRow('Kategori', widget.category),
@@ -977,12 +1082,21 @@ class _DetailScreenState extends State<DetailScreen> {
             width: 120,
             child: Text(
               label,
-              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+              style: TextStyle(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
+                fontSize: 14,
+              ),
             ),
           ),
           Text(
             ': $value',
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
         ],
       ),
@@ -991,20 +1105,28 @@ class _DetailScreenState extends State<DetailScreen> {
 
   Widget _buildDescription() {
     return Container(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(top: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Deskripsi Produk',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
           const SizedBox(height: 12),
           Text(
             widget.description,
-            style: const TextStyle(fontSize: 14, height: 1.5),
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.5,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
         ],
       ),
@@ -1015,10 +1137,13 @@ class _DetailScreenState extends State<DetailScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
+            color:
+                Theme.of(context).brightness == Brightness.dark
+                    ? Colors.black26
+                    : Colors.black12,
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -1045,8 +1170,10 @@ class _DetailScreenState extends State<DetailScreen> {
                   );
                 },
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.teal,
-                  side: const BorderSide(color: Colors.teal),
+                  foregroundColor: Theme.of(context).colorScheme.primary,
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   padding: const EdgeInsets.all(16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -1066,8 +1193,8 @@ class _DetailScreenState extends State<DetailScreen> {
               icon: const Icon(Icons.add_shopping_cart_outlined),
               label: const Text('Keranjang'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.teal,
-                side: const BorderSide(color: Colors.teal),
+                foregroundColor: Theme.of(context).colorScheme.primary,
+                side: BorderSide(color: Theme.of(context).colorScheme.primary),
                 padding: const EdgeInsets.symmetric(
                   vertical: 16,
                   horizontal: 16,
@@ -1102,8 +1229,13 @@ class _DetailScreenState extends State<DetailScreen> {
                         }
                         : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: widget.stock > 0 ? Colors.teal : Colors.grey,
-                  foregroundColor: Colors.white,
+                  backgroundColor:
+                      widget.stock > 0
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[700]
+                          : Colors.grey,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

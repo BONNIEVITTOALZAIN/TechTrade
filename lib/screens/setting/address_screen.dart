@@ -137,9 +137,9 @@ class _AddressPageState extends State<AddressPage> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Lokasi berhasil disimpan'),
-          backgroundColor: Colors.teal,
+        SnackBar(
+          content: const Text('Lokasi berhasil disimpan'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
       );
     } catch (e) {
@@ -155,11 +155,16 @@ class _AddressPageState extends State<AddressPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Alamat',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: theme.appBarTheme.foregroundColor,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         elevation: 0,
         centerTitle: true,
@@ -183,6 +188,8 @@ class _AddressPageState extends State<AddressPage> {
   }
 
   Widget _buildLoadingWidget() {
+    final theme = Theme.of(context);
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -190,18 +197,20 @@ class _AddressPageState extends State<AddressPage> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.teal.withValues(alpha: 0.1),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
                   blurRadius: 20,
                   spreadRadius: 5,
                 ),
               ],
             ),
-            child: const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.teal),
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(
+                theme.colorScheme.primary,
+              ),
               strokeWidth: 3,
             ),
           ),
@@ -209,14 +218,14 @@ class _AddressPageState extends State<AddressPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.9),
+              color: theme.cardColor.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(25),
             ),
-            child: const Text(
+            child: Text(
               'Mengambil lokasi Anda...',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.teal,
+                color: theme.colorScheme.primary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -227,12 +236,14 @@ class _AddressPageState extends State<AddressPage> {
   }
 
   Widget _buildErrorWidget() {
+    final theme = Theme.of(context);
+
     return Center(
       child: Container(
         margin: const EdgeInsets.all(20),
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -277,8 +288,8 @@ class _AddressPageState extends State<AddressPage> {
                 _handleGetLocationAndSave();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal,
-                foregroundColor: Colors.white,
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 12,
@@ -296,6 +307,8 @@ class _AddressPageState extends State<AddressPage> {
   }
 
   Widget _buildContentWidget() {
+    final theme = Theme.of(context);
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -304,24 +317,24 @@ class _AddressPageState extends State<AddressPage> {
             icon: Icons.location_on,
             title: 'Titik Koordinat',
             content: strLatLong,
-            iconColor: Colors.teal,
+            iconColor: theme.colorScheme.primary,
           ),
           const SizedBox(height: 24),
           _buildInfoCard(
             icon: Icons.home,
             title: 'Alamat',
             content: strAlamat,
-            iconColor: Colors.teal.shade600,
+            iconColor: theme.colorScheme.primary,
           ),
           const SizedBox(height: 40),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.teal.withValues(alpha: 0.05),
+              color: theme.colorScheme.primary.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Colors.teal.withValues(alpha: 0.2),
+                color: theme.colorScheme.primary.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -330,21 +343,21 @@ class _AddressPageState extends State<AddressPage> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.teal.withValues(alpha: 0.1),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.info_outline,
-                    color: Colors.teal,
+                    color: theme.colorScheme.primary,
                     size: 20,
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Text(
                     'Alamat tercatat akan digunakan untuk pengiriman barang.',
                     style: TextStyle(
-                      color: Colors.teal,
+                      color: theme.colorScheme.primary,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -364,15 +377,17 @@ class _AddressPageState extends State<AddressPage> {
     required String content,
     required Color iconColor,
   }) {
+    final theme = Theme.of(context);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.teal.withValues(alpha: 0.08),
+            color: theme.colorScheme.primary.withValues(alpha: 0.08),
             blurRadius: 20,
             spreadRadius: 0,
             offset: const Offset(0, 4),
@@ -395,7 +410,7 @@ class _AddressPageState extends State<AddressPage> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.grey.shade800,
+              color: theme.textTheme.titleLarge?.color,
             ),
           ),
           const SizedBox(height: 12),
@@ -403,16 +418,25 @@ class _AddressPageState extends State<AddressPage> {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+              color:
+                  theme.brightness == Brightness.light
+                      ? Colors.grey.shade50
+                      : theme.colorScheme.surface.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade200, width: 1),
+              border: Border.all(
+                color:
+                    theme.brightness == Brightness.light
+                        ? Colors.grey.shade200
+                        : theme.colorScheme.outline.withValues(alpha: 0.3),
+                width: 1,
+              ),
             ),
             child: Text(
               content,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 15,
-                color: Colors.grey.shade700,
+                color: theme.textTheme.bodyMedium?.color,
                 height: 1.4,
               ),
             ),

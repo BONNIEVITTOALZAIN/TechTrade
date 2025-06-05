@@ -117,16 +117,17 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           'Keranjang Belanja (${cartItems.length})',
-          style: const TextStyle(fontWeight: FontWeight.w600),
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 0.5,
         actions: [
           if (cartItems.isNotEmpty)
             TextButton(
@@ -135,14 +136,24 @@ class _CartScreenState extends State<CartScreen> {
                   context: context,
                   builder:
                       (context) => AlertDialog(
-                        title: const Text('Hapus Semua'),
-                        content: const Text(
+                        backgroundColor: theme.colorScheme.surface,
+                        title: Text(
+                          'Hapus Semua',
+                          style: theme.textTheme.titleLarge,
+                        ),
+                        content: Text(
                           'Yakin ingin menghapus semua item dari keranjang?',
+                          style: theme.textTheme.bodyMedium,
                         ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: const Text('Batal'),
+                            child: Text(
+                              'Batal',
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
                           ),
                           TextButton(
                             onPressed: () async {
@@ -175,6 +186,8 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Widget _buildEmptyCart() {
+    final theme = Theme.of(context);
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -182,32 +195,33 @@ class _CartScreenState extends State<CartScreen> {
           Icon(
             Icons.shopping_cart_outlined,
             size: 100,
-            color: Colors.grey[400],
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
           ),
           const SizedBox(height: 16),
           Text(
             'Keranjang Masih Kosong',
-            style: TextStyle(
-              fontSize: 18,
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w500,
-              color: Colors.grey[600],
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Yuk, mulai belanja dan tambahkan produk ke keranjang',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+            ),
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.shopping_bag_outlined),
             label: const Text('Mulai Belanja'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.teal,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            style: theme.elevatedButtonTheme.style?.copyWith(
+              padding: WidgetStateProperty.all(
+                const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
             ),
           ),
         ],
@@ -216,33 +230,41 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Widget _buildCartList() {
+    final theme = Theme.of(context);
+
     return Column(
       children: [
         Container(
-          color: Colors.white,
+          color: theme.cardColor,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
               Checkbox(
                 value: selectAll,
                 onChanged: (_) => toggleSelectAll(),
-                activeColor: Colors.teal,
+                activeColor: theme.colorScheme.primary,
               ),
-              const Text(
+              Text(
                 'Pilih Semua',
-                style: TextStyle(fontWeight: FontWeight.w500),
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               const Spacer(),
               if (getSelectedItemsCount() > 0)
                 Text(
                   '${getSelectedItemsCount()} item dipilih',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
                 ),
             ],
           ),
         ),
-        const Divider(height: 1),
-
+        Divider(
+          height: 1,
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.12),
+        ),
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(vertical: 8),
@@ -255,6 +277,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Widget _buildCartItem(int index) {
+    final theme = Theme.of(context);
     final item = cartItems[index];
     final imageBytes = base64Decode(item['image']);
     final isSelected = isCheckedList[index];
@@ -262,11 +285,11 @@ class _CartScreenState extends State<CartScreen> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -287,15 +310,16 @@ class _CartScreenState extends State<CartScreen> {
                       selectAll = isCheckedList.every((checked) => checked);
                     });
                   },
-                  activeColor: Colors.teal,
+                  activeColor: theme.colorScheme.primary,
                 ),
-
                 Container(
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey[200]!),
+                    border: Border.all(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                    ),
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
@@ -305,9 +329,7 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                   ),
                 ),
-
                 const SizedBox(width: 12),
-
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -316,68 +338,63 @@ class _CartScreenState extends State<CartScreen> {
                         item['itemName'],
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 16,
+                        style: theme.textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(height: 8),
-
                       Row(
                         children: [
                           if (item['originalPrice'] != null) ...[
                             Text(
                               'Rp${NumberFormat('#,##0', 'id_ID').format(item['originalPrice'])}',
-                              style: TextStyle(
+                              style: theme.textTheme.bodySmall?.copyWith(
                                 decoration: TextDecoration.lineThrough,
-                                color: Colors.grey[500],
-                                fontSize: 12,
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.5,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),
                           ],
                           Text(
                             'Rp${NumberFormat('#,##0', 'id_ID').format(item['price'])}',
-                            style: const TextStyle(
-                              fontSize: 16,
+                            style: theme.textTheme.bodyLarge?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: Colors.teal,
+                              color: theme.colorScheme.primary,
                             ),
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 8),
-
                       if (item['stock'] != null)
                         Text(
                           'Stok: ${item['stock']}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.6,
+                            ),
                           ),
                         ),
                     ],
                   ),
                 ),
-
-                // Delete Button
                 IconButton(
                   onPressed: () => removeFromCart(index),
                   icon: const Icon(Icons.delete_outline),
-                  color: Colors.teal[400],
+                  color: theme.colorScheme.primary.withValues(alpha: 0.7),
                 ),
               ],
             ),
-
             const SizedBox(height: 12),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[300]!),
+                    border: Border.all(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                    ),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -403,8 +420,7 @@ class _CartScreenState extends State<CartScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
                           '${cartItems[index]['quantity']}',
-                          style: const TextStyle(
-                            fontSize: 16,
+                          style: theme.textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -437,13 +453,11 @@ class _CartScreenState extends State<CartScreen> {
                     ],
                   ),
                 ),
-
                 Text(
                   'Rp${NumberFormat('#,##0', 'id_ID').format((item['price'] as num) * item['quantity'])}',
-                  style: const TextStyle(
-                    fontSize: 16,
+                  style: theme.textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Colors.teal,
+                    color: theme.colorScheme.primary,
                   ),
                 ),
               ],
@@ -455,15 +469,16 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Widget _buildBottomBar() {
+    final theme = Theme.of(context);
     final selectedCount = getSelectedItemsCount();
     final total = getTotal();
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, -2),
           ),
@@ -483,15 +498,18 @@ class _CartScreenState extends State<CartScreen> {
                     children: [
                       Text(
                         'Total ($selectedCount item)',
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.6,
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Rp${NumberFormat('#,##0', 'id_ID').format(total)}',
-                        style: const TextStyle(
-                          fontSize: 20,
+                        style: theme.textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Colors.teal,
+                          color: theme.colorScheme.primary,
                         ),
                       ),
                     ],
@@ -534,24 +552,26 @@ class _CartScreenState extends State<CartScreen> {
                               }
                             }
                             : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 12,
+                    style: theme.elevatedButtonTheme.style?.copyWith(
+                      padding: WidgetStateProperty.all(
+                        const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 12,
+                        ),
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                      shape: WidgetStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
                     child: Text(
                       selectedCount > 0
                           ? 'Checkout ($selectedCount)'
                           : 'Pilih Item',
-                      style: const TextStyle(
-                        fontSize: 16,
+                      style: theme.textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
                     ),
                   ),

@@ -25,8 +25,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     if (currentUserId == null) {
-      return Scaffold(body: Center(child: Text('Please login first')));
+      return Scaffold(
+        body: Center(
+          child: Text('Please login first', style: theme.textTheme.bodyLarge),
+        ),
+      );
     }
 
     return Scaffold(
@@ -39,11 +45,20 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(
+                color: theme.colorScheme.primary,
+              ),
+            );
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(
+              child: Text(
+                'Error: ${snapshot.error}',
+                style: theme.textTheme.bodyLarge,
+              ),
+            );
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -54,12 +69,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   Icon(
                     Icons.chat_bubble_outline,
                     size: 64,
-                    color: Colors.grey[400],
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                   ),
                   SizedBox(height: 16),
                   Text(
                     'Belum ada chat',
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                   ),
                 ],
               ),
@@ -125,14 +142,20 @@ class _ChatListScreenState extends State<ChatListScreen> {
     required DateTime? lastMessageTime,
     required bool isSeller,
   }) {
+    final theme = Theme.of(context);
+
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      color: theme.cardColor,
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: Colors.teal[100],
+          backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
           child: Text(
             otherUserName.isNotEmpty ? otherUserName[0].toUpperCase() : 'U',
-            style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: theme.colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         title: Row(
@@ -140,13 +163,17 @@ class _ChatListScreenState extends State<ChatListScreen> {
             Expanded(
               child: Text(
                 otherUserName,
-                style: TextStyle(fontWeight: FontWeight.w600),
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             if (lastMessageTime != null)
               Text(
                 DateFormat('HH:mm').format(lastMessageTime),
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
               ),
           ],
         ),
@@ -156,9 +183,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
             if (productInfo != null) ...[
               Text(
                 'Produk: ${productInfo['productName'] ?? 'Unknown'}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.teal[700],
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -166,13 +192,15 @@ class _ChatListScreenState extends State<ChatListScreen> {
             ],
             Text(
               lastMessage.isNotEmpty ? lastMessage : 'Belum ada pesan',
-              style: TextStyle(color: Colors.grey[600]),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
-        trailing: Icon(Icons.chevron_right),
+        trailing: Icon(Icons.chevron_right, color: theme.iconTheme.color),
         onTap: () {
           String targetSellerId;
           String targetSellerName;

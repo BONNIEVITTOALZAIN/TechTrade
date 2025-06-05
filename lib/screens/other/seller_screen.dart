@@ -190,8 +190,10 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: RefreshIndicator(
         onRefresh: _refreshData,
         child: NestedScrollView(
@@ -201,8 +203,8 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
                 expandedHeight: 220,
                 floating: false,
                 pinned: true,
-                backgroundColor: Colors.teal,
-                foregroundColor: Colors.white,
+                backgroundColor: theme.primaryColor,
+                foregroundColor: theme.colorScheme.onPrimary,
                 flexibleSpace: FlexibleSpaceBar(
                   background: _buildProfileHeader(),
                 ),
@@ -212,9 +214,10 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
                     height: 40,
                     child: TabBar(
                       controller: _tabController,
-                      indicatorColor: Colors.white,
-                      labelColor: Colors.white,
-                      unselectedLabelColor: Colors.white70,
+                      indicatorColor: theme.colorScheme.onPrimary,
+                      labelColor: theme.colorScheme.onPrimary,
+                      unselectedLabelColor: theme.colorScheme.onPrimary
+                          .withValues(alpha: 0.7),
                       labelStyle: const TextStyle(fontSize: 14),
                       tabs: const [Tab(text: 'Produk'), Tab(text: 'Info Toko')],
                     ),
@@ -233,12 +236,17 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
   }
 
   Widget _buildProfileHeader() {
+    final theme = Theme.of(context);
+
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Colors.teal, Color(0xFF00695C)],
+          colors: [
+            theme.primaryColor,
+            theme.primaryColor.withValues(alpha: 0.8),
+          ],
         ),
       ),
       child: SafeArea(
@@ -252,8 +260,8 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
               const SizedBox(height: 6),
               Text(
                 widget.sellerName,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: theme.colorScheme.onPrimary,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -262,15 +270,18 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.location_on_outlined,
-                    color: Colors.white70,
+                    color: theme.colorScheme.onPrimary.withValues(alpha: 0.7),
                     size: 12,
                   ),
                   const SizedBox(width: 2),
                   Text(
                     widget.sellerLocation,
-                    style: const TextStyle(color: Colors.white70, fontSize: 11),
+                    style: TextStyle(
+                      color: theme.colorScheme.onPrimary.withValues(alpha: 0.7),
+                      fontSize: 11,
+                    ),
                   ),
                 ],
               ),
@@ -284,7 +295,9 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
   }
 
   Widget _buildSellerAvatar() {
+    final theme = Theme.of(context);
     Uint8List? userPhotoBytes;
+
     if (sellerData != null && sellerData!['photo'] != null) {
       final base64String = sellerData!['photo'];
       if (base64String is String && base64String.isNotEmpty) {
@@ -299,22 +312,27 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 3),
+        border: Border.all(color: theme.colorScheme.onPrimary, width: 3),
       ),
       child: CircleAvatar(
         radius: 30,
         backgroundImage:
             userPhotoBytes != null ? MemoryImage(userPhotoBytes) : null,
-        backgroundColor: Colors.white24,
+        backgroundColor: theme.colorScheme.onPrimary.withValues(alpha: 0.2),
         child:
             userPhotoBytes == null
-                ? const Icon(Icons.person_2, size: 30, color: Colors.white)
+                ? Icon(
+                  Icons.person_2,
+                  size: 30,
+                  color: theme.colorScheme.onPrimary,
+                )
                 : null,
       ),
     );
   }
 
   Widget _buildSellerStats() {
+    final theme = Theme.of(context);
     final totalProducts = _cachedProducts?.length ?? 0;
 
     double averageRating = 0.0;
@@ -338,7 +356,7 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.white24,
+            color: theme.colorScheme.onPrimary.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
@@ -348,7 +366,7 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
               Container(
                 height: 20,
                 width: 1,
-                color: Colors.white54,
+                color: theme.colorScheme.onPrimary.withValues(alpha: 0.5),
                 margin: const EdgeInsets.symmetric(horizontal: 12),
               ),
               _buildStatItem(
@@ -363,28 +381,37 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
   }
 
   Widget _buildStatItem(String label, String value) {
+    final theme = Theme.of(context);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: theme.colorScheme.onPrimary,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
         Text(
           label,
-          style: const TextStyle(color: Colors.white70, fontSize: 10),
+          style: TextStyle(
+            color: theme.colorScheme.onPrimary.withValues(alpha: 0.7),
+            fontSize: 10,
+          ),
         ),
       ],
     );
   }
 
   Widget _buildProductsTab() {
+    final theme = Theme.of(context);
+
     if (_isLoadingProducts) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(
+        child: CircularProgressIndicator(color: theme.primaryColor),
+      );
     }
 
     if (_cachedProducts == null || _cachedProducts!.isEmpty) {
@@ -424,6 +451,7 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
   }
 
   Widget _buildProductCard(Map<String, dynamic> data, String postId) {
+    final theme = Theme.of(context);
     final List<String> images = List<String>.from(data['images'] ?? []);
     final String itemName = data['itemName'] ?? data['title'] ?? '';
     final double price = (data['price'] ?? 0).toDouble();
@@ -458,11 +486,11 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: theme.shadowColor.withValues(alpha: 0.1),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -489,20 +517,24 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Container(
-                                color: Colors.grey[200],
-                                child: const Icon(
+                                color: theme.colorScheme.surface,
+                                child: Icon(
                                   Icons.broken_image,
-                                  color: Colors.grey,
+                                  color: theme.colorScheme.onSurface.withValues(
+                                    alpha: 0.5,
+                                  ),
                                   size: 40,
                                 ),
                               );
                             },
                           )
                           : Container(
-                            color: Colors.grey[200],
-                            child: const Icon(
+                            color: theme.colorScheme.surface,
+                            child: Icon(
                               Icons.image,
-                              color: Colors.grey,
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.5,
+                              ),
                               size: 40,
                             ),
                           ),
@@ -517,9 +549,10 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
                 children: [
                   Text(
                     itemName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
+                      color: theme.colorScheme.onSurface,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -527,8 +560,8 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
                   const SizedBox(height: 6),
                   Text(
                     'Rp ${NumberFormat('#,##0', 'id_ID').format(price)}',
-                    style: const TextStyle(
-                      color: Colors.teal,
+                    style: TextStyle(
+                      color: theme.primaryColor,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                     ),
@@ -545,8 +578,10 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
                       Expanded(
                         child: Text(
                           location,
-                          style: const TextStyle(
-                            color: Colors.grey,
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.6,
+                            ),
                             fontSize: 11,
                           ),
                           maxLines: 1,
@@ -590,14 +625,22 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
   }
 
   Widget _buildRatingSection() {
+    final theme = Theme.of(context);
+
     if (_isLoadingRatings) {
-      return const Text('Loading...');
+      return Text(
+        'Loading...',
+        style: TextStyle(color: theme.colorScheme.onSurface),
+      );
     }
 
     if (_cachedRatings == null || _cachedRatings!.isEmpty) {
-      return const Text(
+      return Text(
         'Belum ada rating',
-        style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
+        style: TextStyle(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          fontStyle: FontStyle.italic,
+        ),
       );
     }
 
@@ -620,10 +663,10 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
           children: [
             Text(
               averageRating.toStringAsFixed(1),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: Colors.teal,
+                color: theme.primaryColor,
               ),
             ),
             const SizedBox(width: 8),
@@ -645,7 +688,10 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
                 ),
                 Text(
                   '${_cachedRatings!.length} ulasan',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -662,20 +708,32 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
             padding: const EdgeInsets.symmetric(vertical: 2),
             child: Row(
               children: [
-                Text('$stars', style: const TextStyle(fontSize: 12)),
+                Text(
+                  '$stars',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
                 const Icon(Icons.star, color: Colors.amber, size: 16),
                 const SizedBox(width: 8),
                 Expanded(
                   child: LinearProgressIndicator(
                     value: percentage,
-                    backgroundColor: Colors.grey[200],
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      Colors.teal,
+                    backgroundColor: theme.colorScheme.surface,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      theme.primaryColor,
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text('$count', style: const TextStyle(fontSize: 12)),
+                Text(
+                  '$count',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
               ],
             ),
           );
@@ -685,15 +743,17 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
   }
 
   Widget _buildInfoCard(String title, List<Widget> children) {
+    final theme = Theme.of(context);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: theme.shadowColor.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -704,7 +764,11 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
         children: [
           Text(
             title,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
+            ),
           ),
           const SizedBox(height: 16),
           ...children,
@@ -714,6 +778,8 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
   }
 
   Widget _buildInfoRow(String label, String value) {
+    final theme = Theme.of(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -723,13 +789,20 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
             width: 120,
             child: Text(
               label,
-              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+              style: TextStyle(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                fontSize: 14,
+              ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: theme.colorScheme.onSurface,
+              ),
             ),
           ),
         ],
@@ -738,8 +811,13 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
   }
 
   Widget _buildCategoriesSection() {
+    final theme = Theme.of(context);
+
     if (_cachedProducts == null) {
-      return const Text('Loading...');
+      return Text(
+        'Loading...',
+        style: TextStyle(color: theme.colorScheme.onSurface),
+      );
     }
 
     final Set<String> categories = {};
@@ -751,9 +829,12 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
     }
 
     if (categories.isEmpty) {
-      return const Text(
+      return Text(
         'Belum ada kategori produk',
-        style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
+        style: TextStyle(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          fontStyle: FontStyle.italic,
+        ),
       );
     }
 
@@ -765,14 +846,14 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.teal[50],
+                color: theme.primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.teal),
+                border: Border.all(color: theme.primaryColor),
               ),
               child: Text(
                 category,
-                style: const TextStyle(
-                  color: Colors.teal,
+                style: TextStyle(
+                  color: theme.primaryColor,
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                 ),
@@ -783,24 +864,33 @@ class _SellerProfileScreenState extends State<SellerProfileScreen>
   }
 
   Widget _buildEmptyState() {
+    final theme = Theme.of(context);
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.store_outlined, size: 80, color: Colors.grey[400]),
+          Icon(
+            Icons.store_outlined,
+            size: 80,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+          ),
           const SizedBox(height: 16),
           Text(
             'Belum ada produk',
             style: TextStyle(
               fontSize: 18,
-              color: Colors.grey[600],
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Penjual belum menambahkan produk apapun',
-            style: TextStyle(fontSize: 14, color: Colors.grey[400]),
+            style: TextStyle(
+              fontSize: 14,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+            ),
           ),
         ],
       ),

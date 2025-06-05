@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:typed_data';
-
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
@@ -92,7 +91,11 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
 
   Widget _buildItemImage(String? base64Image) {
     if (base64Image == null || base64Image.isEmpty) {
-      return Icon(Icons.inventory_2, color: Colors.grey.shade600, size: 20);
+      return Icon(
+        Icons.inventory_2,
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+        size: 20,
+      );
     }
 
     try {
@@ -113,7 +116,9 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
             print("Error loading base64 image: $error");
             return Icon(
               Icons.inventory_2,
-              color: Colors.grey.shade600,
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
               size: 20,
             );
           },
@@ -121,13 +126,19 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
       );
     } catch (e) {
       print("Error decoding base64 image: $e");
-      return Icon(Icons.inventory_2, color: Colors.grey.shade600, size: 20);
+      return Icon(
+        Icons.inventory_2,
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+        size: 20,
+      );
     }
   }
 
   Widget _buildInfoCard(String title, IconData icon, List<Widget> children) {
+    final theme = Theme.of(context);
     return Card(
       elevation: 3,
+      color: theme.cardColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -136,14 +147,13 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
           children: [
             Row(
               children: [
-                Icon(icon, color: Colors.teal.shade700),
+                Icon(icon, color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: theme.textTheme.titleLarge?.copyWith(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
                   ),
                 ),
               ],
@@ -162,6 +172,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
     bool isStatus = false,
     bool isMultiline = false,
   }) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -172,14 +183,19 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
             width: 120,
             child: Text(
               label,
-              style: TextStyle(
-                color: Colors.grey.shade600,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
-          const Text(': ', style: TextStyle(color: Colors.grey)),
+          Text(
+            ': ',
+            style: TextStyle(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+            ),
+          ),
           Expanded(
             child:
                 isStatus
@@ -203,9 +219,8 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     )
                     : Text(
                       value,
-                      style: const TextStyle(
+                      style: theme.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: Colors.black87,
                       ),
                     ),
           ),
@@ -215,6 +230,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   }
 
   Widget _buildCostRow(String label, double amount, {bool isTotal = false}) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -222,18 +238,24 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
         children: [
           Text(
             label,
-            style: TextStyle(
+            style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: isTotal ? 16 : 14,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-              color: isTotal ? Colors.black87 : Colors.grey.shade700,
+              color:
+                  isTotal
+                      ? theme.colorScheme.onSurface
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.8),
             ),
           ),
           Text(
             'Rp${_formatCurrency(amount)}',
-            style: TextStyle(
+            style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: isTotal ? 16 : 14,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
-              color: isTotal ? Colors.teal.shade700 : Colors.black87,
+              color:
+                  isTotal
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface,
             ),
           ),
         ],
@@ -243,13 +265,15 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Detail Transaksi'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 1,
+        backgroundColor: theme.appBarTheme.backgroundColor,
+        foregroundColor: theme.appBarTheme.foregroundColor,
+        elevation: theme.appBarTheme.elevation,
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -263,14 +287,17 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.teal.shade600, Colors.teal.shade400],
+                  colors: [
+                    theme.colorScheme.primary,
+                    theme.colorScheme.primary.withValues(alpha: 0.8),
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.teal.withValues(alpha: (0.3)),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.3),
                     blurRadius: 15,
                     offset: const Offset(0, 8),
                   ),
@@ -281,7 +308,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: (0.2)),
+                      color: Colors.white.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -303,7 +330,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   Text(
                     'Terima kasih atas pembelian Anda',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: (0.9)),
+                      color: Colors.white.withValues(alpha: 0.9),
                       fontSize: 16,
                     ),
                   ),
@@ -341,6 +368,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
             // Items Card
             Card(
               elevation: 3,
+              color: theme.cardColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -351,14 +379,16 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.shopping_bag, color: Colors.teal.shade700),
+                        Icon(
+                          Icons.shopping_bag,
+                          color: theme.colorScheme.primary,
+                        ),
                         const SizedBox(width: 8),
-                        const Text(
+                        Text(
                           'Produk Dibeli',
-                          style: TextStyle(
+                          style: theme.textTheme.titleLarge?.copyWith(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
                           ),
                         ),
                       ],
@@ -368,7 +398,11 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: widget.items.length,
-                      separatorBuilder: (_, __) => const Divider(height: 20),
+                      separatorBuilder:
+                          (_, __) => Divider(
+                            height: 20,
+                            color: theme.colorScheme.onSurface.withOpacity(0.2),
+                          ),
                       itemBuilder: (context, index) {
                         final item = widget.items[index];
                         return Row(
@@ -378,8 +412,13 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                               width: 60,
                               height: 60,
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade200,
+                                color: theme.colorScheme.surface,
                                 borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: theme.colorScheme.onSurface.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                ),
                               ),
                               child: _buildItemImage(item['image']),
                             ),
@@ -390,7 +429,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                                 children: [
                                   Text(
                                     item['itemName'],
-                                    style: const TextStyle(
+                                    style: theme.textTheme.bodyLarge?.copyWith(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 16,
                                     ),
@@ -398,16 +437,18 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                                   const SizedBox(height: 4),
                                   Text(
                                     'Qty: ${item['quantity']}',
-                                    style: TextStyle(
-                                      color: Colors.grey.shade600,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.7),
                                       fontSize: 14,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     'Rp${_formatCurrency(item['price'])} / item',
-                                    style: TextStyle(
-                                      color: Colors.grey.shade600,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.7),
                                       fontSize: 14,
                                     ),
                                   ),
@@ -416,10 +457,10 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                             ),
                             Text(
                               'Rp${_formatCurrency((item['price'] as num) * item['quantity'])}',
-                              style: const TextStyle(
+                              style: theme.textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
-                                color: Colors.teal,
+                                color: theme.colorScheme.primary,
                               ),
                             ),
                           ],
@@ -433,8 +474,10 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
 
             const SizedBox(height: 16),
 
+            // Payment Details Card
             Card(
               elevation: 3,
+              color: theme.cardColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -445,14 +488,13 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.payment, color: Colors.teal.shade700),
+                        Icon(Icons.payment, color: theme.colorScheme.primary),
                         const SizedBox(width: 8),
-                        const Text(
+                        Text(
                           'Rincian Pembayaran',
-                          style: TextStyle(
+                          style: theme.textTheme.titleLarge?.copyWith(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
                           ),
                         ),
                       ],
@@ -460,7 +502,10 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     const SizedBox(height: 16),
                     _buildCostRow('Subtotal Produk', widget.itemsTotal),
                     _buildCostRow('Biaya Pengiriman', widget.shippingCost),
-                    const Divider(height: 20),
+                    Divider(
+                      height: 20,
+                      color: theme.colorScheme.onSurface.withOpacity(0.2),
+                    ),
                     _buildCostRow(
                       'Total Pembayaran',
                       widget.totalPrice,
@@ -479,7 +524,6 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () {
-                      // Implement download invoice functionality
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text(
@@ -492,8 +536,8 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     icon: const Icon(Icons.download),
                     label: const Text('Unduh Invoice'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.teal.shade700,
-                      side: BorderSide(color: Colors.teal.shade700),
+                      foregroundColor: theme.colorScheme.primary,
+                      side: BorderSide(color: theme.colorScheme.primary),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -510,8 +554,8 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     icon: const Icon(Icons.home),
                     label: const Text('Kembali ke Beranda'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal.shade600,
-                      foregroundColor: Colors.white,
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: theme.colorScheme.onPrimary,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -528,6 +572,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
             // Help Section
             Card(
               elevation: 2,
+              color: theme.cardColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -552,17 +597,19 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Butuh Bantuan?',
-                            style: TextStyle(
+                            style: theme.textTheme.bodyMedium?.copyWith(
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
                           ),
                           Text(
                             'Hubungi customer service kami untuk bantuan lebih lanjut',
-                            style: TextStyle(
-                              color: Colors.grey.shade600,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.7,
+                              ),
                               fontSize: 12,
                             ),
                           ),
@@ -571,7 +618,6 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     ),
                     TextButton(
                       onPressed: () {
-                        // Implement contact support functionality
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text(

@@ -117,13 +117,11 @@ class _SplashScreenState extends State<SplashScreen>
       body: SafeArea(
         child: Column(
           children: [
-            // Main content area
             Expanded(
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Logo dengan animasi scale dan fade
                     AnimatedBuilder(
                       animation: Listenable.merge([
                         _fadeAnimation,
@@ -142,7 +140,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 color: Colors.teal[500],
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.teal.withOpacity(0.25),
+                                    color: Colors.teal.withValues(alpha: 0.25),
                                     blurRadius: 24,
                                     offset: const Offset(0, 8),
                                   ),
@@ -163,7 +161,6 @@ class _SplashScreenState extends State<SplashScreen>
 
                     const SizedBox(height: 32),
 
-                    // Brand name dengan fade animation
                     FadeTransition(
                       opacity: _fadeAnimation,
                       child: Column(
@@ -194,7 +191,6 @@ class _SplashScreenState extends State<SplashScreen>
               ),
             ),
 
-            // Bottom loading indicator
             Padding(
               padding: const EdgeInsets.only(bottom: 48),
               child: AnimatedBuilder(
@@ -202,7 +198,6 @@ class _SplashScreenState extends State<SplashScreen>
                 builder: (context, child) {
                   return Column(
                     children: [
-                      // Progress bar
                       Container(
                         width: 120,
                         height: 3,
@@ -227,7 +222,6 @@ class _SplashScreenState extends State<SplashScreen>
 
                       const SizedBox(height: 16),
 
-                      // Loading text
                       FadeTransition(
                         opacity: _fadeAnimation,
                         child: Text(
